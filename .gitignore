@@ -1,0 +1,14 @@
+# Yarn stuff
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
+
+# Typescript compiled files
+dist/
+
+# Typescript temp files
+.tsbuildinfo

@@ -1,0 +1,24 @@
+{
+  "name": "ants",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "author": "Georgy Angelov <georgyangelov@gmail.com>",
+  "license": "MIT",
+  "packageManager": "yarn@3.0.0",
+  "scripts": {
+    "build": "tsc"
+  },
+  "files": [
+    "dist/*",
+    "README.md",
+    "LICENSE",
+    "package.json"
+  ],
+  "dependencies": {
+    "ts-node": "^10.1.0",
+    "typescript": "^4.3.5"
+  },
+  "devDependencies": {
+    "@types/node": "^16.4.8"
+  }
+}
