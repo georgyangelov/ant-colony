@@ -1,9 +1,12 @@
-import { sleep } from "./lib/sleep";
 import { Scenario, ScenarioContext } from "./scenarios";
+import fetch from 'node-fetch';
 
 export interface RequestActionInfo {
   url: string;
-  totalTime: number;
+  statusCode: number | undefined;
+
+  startedAtUnixMs: number;
+  responseTimeMs: number;
 }
 
 export class Actions {
@@ -15,12 +18,15 @@ export class Actions {
     //   throw new CancelError();
     // }
 
-    await sleep(666);
+    await fetch(url);
 
-    this.context.reporter.onRequestComplete(
-      { url, totalTime: 666 },
-      this.scenario,
-      this.context
-    );
+    // await sleep(666);
+
+    // TODO: Make sure this ignores the node interceptor
+    // this.context.reporter.onRequestComplete(
+    //   { url, statusCode: 404, responseTimeMs: 666 },
+    //   this.scenario,
+    //   this.context
+    // );
   }
 }

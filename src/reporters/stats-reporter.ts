@@ -4,6 +4,12 @@ import { Reporter } from "../reporter";
 import { Scenario, ScenarioContext } from "../scenarios";
 import { TestRun } from "../tests";
 
+export interface RequestTiming {
+  startedAt: number;
+  responseTime: number;
+  statusCode: number | undefined;
+}
+
 export interface PhaseStats {
   phase: Phase;
 
@@ -11,7 +17,7 @@ export interface PhaseStats {
   endTime: Date;
 
   scenarioCount: number;
-  requestCount: number;
+  requestTimings: RequestTiming[];
 }
 
 export class StatsReporter implements Reporter {
@@ -27,7 +33,7 @@ export class StatsReporter implements Reporter {
       phase,
       startTime: new Date(),
       scenarioCount: 0,
-      requestCount: 0
+      requestTimings: []
     };
   }
   onPhaseComplete(phase: Phase, context: PhaseContext) {
@@ -46,6 +52,10 @@ export class StatsReporter implements Reporter {
   onScenarioError(scenario: Scenario, context: ScenarioContext) {}
 
   onRequestComplete(request: RequestActionInfo, scenario: Scenario, context: ScenarioContext) {
-    this.currentPhase.requestCount++;
+    this.currentPhase.requestTimings.push({
+      startedAt: request.startedAtUnixMs,
+      responseTime: request.responseTimeMs,
+      statusCode: request.statusCode
+    });
   }
 }

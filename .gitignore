@@ -7,6 +7,9 @@
 !.yarn/versions
 .pnp.*
 
+# Node modules
+node_modules/
+
 # Typescript compiled files
 dist/
 

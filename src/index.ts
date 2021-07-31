@@ -1,3 +1,7 @@
+import { NodeHTTPInterceptor } from './lib/node-http-interceptor';
+
+NodeHTTPInterceptor.hook();
+
 export * from './tests';
 export * from './phases';
 export * from './scenarios';

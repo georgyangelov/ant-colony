@@ -1,9 +1,12 @@
+import { InterceptedResponse, NodeHTTPInterceptor } from "./lib/node-http-interceptor";
 import { timed } from "./lib/timed";
 import { Phase, PhaseContext, PhaseRunResult } from "./phases";
 import { Reporter } from "./reporter";
+import { Scenario } from "./scenarios";
 
-export interface TestRunFlow {
+export interface TestRunConfig {
   reporter: Reporter;
+  httpInterceptor?: { host: string };
 
   phases: Phase[];
 }
@@ -15,24 +18,46 @@ export interface TestRunResult {
 }
 
 export class TestRun {
-  constructor(private config: TestRunFlow) {}
+  constructor(private config: TestRunConfig) {}
 
   async execute(): Promise<TestRunResult> {
-    const phaseResults: PhaseRunResult[] = [];
+    const interceptorConfig = this.config.httpInterceptor;
+    if (interceptorConfig) {
+      NodeHTTPInterceptor.startIntercepting();
+    }
 
-    const [, totalTimeMs] = await timed(async () => {
-      for (const phase of this.config.phases) {
-        const phaseContext = new PhaseContext(this.config.reporter);
-
-        const result = await phase.run(phaseContext);
-
-        phaseResults.push(result);
+    function onInterceptedRequest(intercepted: InterceptedResponse) {
+      if (interceptorConfig && interceptorConfig.host === intercepted.request.host) {
+        Scenario.onInterceptedRequest(intercepted);
       }
-    });
+    }
 
-    return {
-      totalTimeSeconds: totalTimeMs / 1000,
-      phaseResults,
-    };
+    try {
+      if (interceptorConfig) {
+        NodeHTTPInterceptor.events.on('response', onInterceptedRequest);
+      }
+
+      const phaseResults: PhaseRunResult[] = [];
+
+      const [, totalTimeMs] = await timed(async () => {
+        for (const phase of this.config.phases) {
+          const phaseContext = new PhaseContext(this.config.reporter);
+
+          const result = await phase.run(phaseContext);
+
+          phaseResults.push(result);
+        }
+      });
+
+      return {
+        totalTimeSeconds: totalTimeMs / 1000,
+        phaseResults,
+      };
+    } finally {
+      if (interceptorConfig) {
+        NodeHTTPInterceptor.events.off('response', onInterceptedRequest);
+        NodeHTTPInterceptor.stopIntercepting();
+      }
+    }
   }
 }
