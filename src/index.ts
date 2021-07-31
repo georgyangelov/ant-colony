@@ -7,4 +7,6 @@ export * from './phases/single-run-phase';
 export * from './phases/constant-concurrency-phase';
 
 export * from './reporters/void-reporter';
+export * from './reporters/union-reporter';
 export * from './reporters/counting-reporter';
+export * from './reporters/stats-reporter';

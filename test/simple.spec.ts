@@ -1,4 +1,4 @@
-import { ConstantConcurrencyPhase, CountingReporter, Scenario, SingleRunPhase, TestRun } from "../src";
+import { ConstantConcurrencyPhase, CountingReporter, Scenario, SingleRunPhase, StatsReporter, UnionReporter, TestRun } from "../src";
 
 const jestConsole = console;
 
@@ -16,10 +16,14 @@ describe('Simple examples', () => {
       await actions.fetch('http://example.com');
     });
 
-    const reporter = new CountingReporter();
+    const countingReporter = new CountingReporter();
+    const statsReporter = new StatsReporter();
 
     const run = new TestRun({
-      reporter,
+      reporter: new UnionReporter([
+        countingReporter,
+        statsReporter
+      ]),
 
       phases: [
         new SingleRunPhase({
@@ -52,12 +56,19 @@ describe('Simple examples', () => {
 
     console.log(results);
 
-    expect(reporter.counters.phases).toEqual(2);
+    expect(countingReporter.counters.phases).toEqual(2);
 
-    expect(reporter.counters.scenarios).toBeGreaterThan(149);
-    expect(reporter.counters.scenarios).toBeLessThan(154);
+    expect(countingReporter.counters.scenarios).toBeGreaterThan(149);
+    expect(countingReporter.counters.scenarios).toBeLessThan(154);
 
-    expect(reporter.counters.requests).toBeGreaterThan(149);
-    expect(reporter.counters.requests).toBeLessThan(154);
+    expect(countingReporter.counters.requests).toBeGreaterThan(149);
+    expect(countingReporter.counters.requests).toBeLessThan(154);
+
+    console.log(statsReporter.stats);
+
+    expect(statsReporter.stats).toEqual([
+      expect.objectContaining({ phase: expect.objectContaining({ name: 'single-run' }) }),
+      expect.objectContaining({ phase: expect.objectContaining({ name: 'full-load' }) })
+    ]);
   }, 100000);
 });
