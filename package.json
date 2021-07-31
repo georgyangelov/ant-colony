@@ -8,7 +8,8 @@
   "scripts": {
     "build": "tsc",
     "test": "jest",
-    "ants": "ts-node src/bin/ants.ts"
+    "ants": "ts-node src/bin/ants.ts",
+    "example:simple": "ts-node examples/simple.ts"
   },
   "bin": "dist/bin/ants.js",
   "files": [
@@ -19,12 +20,15 @@
   ],
   "dependencies": {
     "eventemitter3": "^4.0.7",
+    "lodash": "^4.17.21",
     "node-fetch": "^2.6.1",
+    "percentile": "^1.5.0",
     "typescript": "^4.3.5"
   },
   "devDependencies": {
     "@types/eventemitter3": "^2.0.2",
     "@types/jest": "^26.0.24",
+    "@types/lodash": "^4.14.171",
     "@types/node": "^16.4.8",
     "@types/node-fetch": "^2.5.12",
     "jest": "^27.0.6",

@@ -14,7 +14,7 @@ export class ConstantConcurrencyPhase implements Phase {
   constructor(private config: ConstantConcurrencyPhaseConfig) {}
 
   async run(context: PhaseContext): Promise<PhaseRunResult> {
-    context.reporter.onPhaseStart(this, context);
+    await context.reporter.onPhaseStart(this, context);
 
     const startTimeMs = Date.now();
     const runningScenarios = new Map<ScenarioContext, Promise<[ScenarioContext, ScenarioRunResult]>>();
@@ -63,7 +63,7 @@ export class ConstantConcurrencyPhase implements Phase {
     }
 
     // TODO: In finally?
-    context.reporter.onPhaseComplete(this, context);
+    await context.reporter.onPhaseComplete(this, context);
 
     return {
       phase: this,

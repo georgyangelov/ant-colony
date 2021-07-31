@@ -14,3 +14,4 @@ export * from './reporters/void-reporter';
 export * from './reporters/union-reporter';
 export * from './reporters/counting-reporter';
 export * from './reporters/stats-reporter';
+export * from './reporters/console-reporter';

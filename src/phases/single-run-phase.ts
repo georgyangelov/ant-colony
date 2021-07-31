@@ -12,11 +12,11 @@ export class SingleRunPhase implements Phase {
   constructor(private config: SingleRunPhaseConfig) {}
 
   async run(context: PhaseContext): Promise<PhaseRunResult> {
-    context.reporter.onPhaseStart(this, context);
+    await context.reporter.onPhaseStart(this, context);
 
     const scenarioResult = await this.runScenario(context);
 
-    context.reporter.onPhaseComplete(this, context);
+    await context.reporter.onPhaseComplete(this, context);
 
     return {
       phase: this,

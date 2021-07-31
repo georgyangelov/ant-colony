@@ -39,6 +39,8 @@ export class TestRun {
 
       const phaseResults: PhaseRunResult[] = [];
 
+      await this.config.reporter.onRunStart(this);
+
       const [, totalTimeMs] = await timed(async () => {
         for (const phase of this.config.phases) {
           const phaseContext = new PhaseContext(this.config.reporter);
@@ -48,6 +50,8 @@ export class TestRun {
           phaseResults.push(result);
         }
       });
+
+      await this.config.reporter.onRunComplete(this);
 
       return {
         totalTimeSeconds: totalTimeMs / 1000,
