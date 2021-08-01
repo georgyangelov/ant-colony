@@ -1,3 +1,4 @@
+- Rename to FireAnts
 - Project generator
 - Some docs
 - Better split of parallel work for lambdas
