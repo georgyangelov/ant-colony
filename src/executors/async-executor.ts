@@ -38,15 +38,16 @@ export class AsyncExecutor implements Executor {
     });
   }
 
-  async runQueuedUntil(
+  async runQueuedFor(
     phaseName: string,
     context: ExecutorRunContext,
-    unixTimeMs: number
+    timeMs: number
   ): Promise<ExecutionResult> {
     const phase = this.findPhase(phaseName);
+    const startTimeMs = Date.now();
 
     return this.withWorkerReporter(phase, async workerReporter => {
-      while (Date.now() < unixTimeMs) {
+      while (Date.now() < startTimeMs + timeMs) {
         await this.runOne(phase, workerReporter);
       }
     });

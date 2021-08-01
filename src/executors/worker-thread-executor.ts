@@ -16,7 +16,7 @@ export function newWorkerThread(test: LoadTest) {
   return {
     runSingle: asyncExecutor.runSingle.bind(asyncExecutor),
     runQueued: asyncExecutor.runQueued.bind(asyncExecutor),
-    runQueuedUntil: asyncExecutor.runQueuedUntil.bind(asyncExecutor),
+    runQueuedFor: asyncExecutor.runQueuedFor.bind(asyncExecutor),
     runParallel: asyncExecutor.runParallel.bind(asyncExecutor),
   };
 }
@@ -84,12 +84,12 @@ export class WorkerThreadExecutor implements Executor {
     return this.pool!.queue(thread => thread.runQueued(phaseName, context, count));
   }
 
-  async runQueuedUntil(
+  async runQueuedFor(
     phaseName: string,
     context: ExecutorRunContext,
-    unixTimeMs: number
+    timeMs: number
   ): Promise<ExecutionResult> {
-    return this.pool!.queue(thread => thread.runQueuedUntil(phaseName, context, unixTimeMs));
+    return this.pool!.queue(thread => thread.runQueuedFor(phaseName, context, timeMs));
   }
 
   async runParallel(

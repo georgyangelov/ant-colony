@@ -1,6 +1,7 @@
 - Project generator
 - Some docs
 - Better split of parallel work for lambdas
+- Lambda executions should max at 800s
 - Better console status for lambda executions
 - Support for data / setup phase
 - Better fetch action:

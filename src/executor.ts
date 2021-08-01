@@ -21,10 +21,10 @@ export interface Executor {
     count: number
   ): Promise<ExecutionResult>;
 
-  runQueuedUntil(
+  runQueuedFor(
     phaseName: string,
     context: ExecutorRunContext,
-    unixTimeMs: number
+    timeMs: number
   ): Promise<ExecutionResult>;
 
   runParallel(

@@ -15,8 +15,7 @@ export interface LambdaPayload {
   phaseName: string;
   task: { type: 'runSingle' } |
         { type: 'runQueued', count: number } |
-        // TODO: Make this `runQueuedFor` to not depend on the clock
-        { type: 'runQueuedUntil', unixTimeMs: number } |
+        { type: 'runQueuedFor', timeMs: number } |
         { type: 'runParallel', count: number };
 }
 
@@ -51,8 +50,8 @@ export class AWSLambdaExecutor implements Executor {
           results = [await executor.runQueued(event.phaseName, event.context, task.count)];
           break;
 
-        case 'runQueuedUntil':
-          results = [await executor.runQueuedUntil(event.phaseName, event.context, task.unixTimeMs)];
+        case 'runQueuedFor':
+          results = [await executor.runQueuedFor(event.phaseName, event.context, task.timeMs)];
           break;
 
         case 'runParallel': {
@@ -125,16 +124,16 @@ export class AWSLambdaExecutor implements Executor {
     return executionResults[0]!;
   }
 
-  async runQueuedUntil(
+  async runQueuedFor(
     phaseName: string,
     context: ExecutorRunContext,
-    unixTimeMs: number
+    timeMs: number
   ): Promise<ExecutionResult> {
     const { executionResults } = await this.runLambda({
       context,
       testModulePath: this.testModulePath,
       phaseName,
-      task: { type: 'runQueuedUntil', unixTimeMs }
+      task: { type: 'runQueuedFor', timeMs }
     });
 
     return executionResults[0]!;
