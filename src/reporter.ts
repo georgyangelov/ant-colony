@@ -3,14 +3,29 @@ import { Phase, PhaseContext } from "./phases";
 import { Scenario, ScenarioContext } from "./scenarios";
 import { TestRun } from "./tests";
 
-export interface Reporter {
+type JSONValue = string | boolean | null | number;
+type JSONArray = (JSONObject | JSONValue)[];
+interface JSONObject {
+  [k: string]: JSONValue | JSONObject | JSONArray;
+}
+
+export type BaseWorkerData = JSONValue | JSONObject | JSONArray;
+
+export interface Reporter<WorkerDataT extends BaseWorkerData> {
   onRunStart(run: TestRun): void | Promise<void>;
   onRunComplete(run: TestRun): void | Promise<void>;
   onRunError(run: TestRun): void | Promise<void>;
 
   onPhaseStart(phase: Phase, context: PhaseContext): void | Promise<void>;
   onPhaseComplete(phase: Phase, context: PhaseContext): void | Promise<void>;
-  onPhaseError(phase: Phase, context: PhaseContext): void | Promise<void>;
+
+  workerReporterFor(test: TestRun, phase: Phase): WorkerReporter<WorkerDataT>;
+  onDataFromWorker(data: WorkerDataT): void | Promise<void>;
+}
+
+export interface WorkerReporter<WorkerDataT extends BaseWorkerData> {
+  init(): void | Promise<void>;
+  complete(): WorkerDataT | Promise<WorkerDataT>;
 
   onScenarioStart(scenario: Scenario, context: ScenarioContext): void;
   onScenarioComplete(scenario: Scenario, context: ScenarioContext): void;

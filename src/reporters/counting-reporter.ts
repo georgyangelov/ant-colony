@@ -1,11 +1,15 @@
-import { RequestActionInfo } from "../actions";
 import { Phase, PhaseContext } from "../phases";
-import { Reporter } from "../reporter";
-import { Scenario, ScenarioContext } from "../scenarios";
+import { Reporter, WorkerReporter } from "../reporter";
 import { TestRun } from "../tests";
 
-export class CountingReporter implements Reporter {
-  counters = {
+type Counters = {
+  phases: 0,
+  scenarios: 0,
+  requests: 0
+};
+
+export class CountingReporter implements Reporter<Counters> {
+  counters: Counters = {
     phases: 0,
     scenarios: 0,
     requests: 0
@@ -21,13 +25,37 @@ export class CountingReporter implements Reporter {
   }
   onPhaseError(phase: Phase, context: PhaseContext) {}
 
-  onScenarioStart(scenario: Scenario, context: ScenarioContext) {}
-  onScenarioComplete(scenario: Scenario, context: ScenarioContext) {
+  workerReporterFor(test: TestRun, phase: Phase) {
+    return new CountingWorkerReporter();
+  }
+
+  onDataFromWorker(data: Counters) {
+    this.counters.phases += data.phases;
+    this.counters.scenarios += data.scenarios;
+    this.counters.requests += data.requests;
+  }
+}
+
+class CountingWorkerReporter implements WorkerReporter<Counters> {
+  private counters: Counters = {
+    phases: 0,
+    scenarios: 0,
+    requests: 0
+  };
+
+  init() {}
+  complete() {
+    return this.counters;
+  }
+
+  onScenarioStart() {
     this.counters.scenarios++;
   }
-  onScenarioError(scenario: Scenario, context: ScenarioContext) {}
+  onScenarioComplete() {}
+  onScenarioError() {}
 
-  onRequestComplete(request: RequestActionInfo, scenario: Scenario, context: ScenarioContext) {
+  onRequestComplete() {
     this.counters.requests++;
   }
 }
+

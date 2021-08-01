@@ -1,20 +1,20 @@
 import { Actions } from "./actions";
 import { InterceptedResponse } from "./lib/node-http-interceptor";
 import { Phase } from "./phases";
-import { Reporter } from "./reporter";
+import { WorkerReporter } from "./reporter";
 import { ContinuationLocal } from './lib/continuation-local';
 import { format as formatUrl } from 'url';
 
 export class ScenarioContext {
   constructor(
     public phase: Phase,
-    public reporter: Reporter
+    public reporter: WorkerReporter<any>
   ) {}
 }
 
-export interface ScenarioRunResult {
-  scenario: Scenario;
-}
+// export interface ScenarioRunResult {
+//   scenario: Scenario;
+// }
 
 export class Scenario {
   static current = new ContinuationLocal<{ scenario: Scenario, context: ScenarioContext }>();
@@ -39,8 +39,6 @@ export class Scenario {
       startedAtUnixMs,
       responseTimeMs
     }, scenario, context);
-
-    // console.log({ url: request.host, status: response.statusCode });
   }
 
   constructor(
@@ -48,7 +46,7 @@ export class Scenario {
     private runFn: (actions: Actions) => Promise<void>
   ) {}
 
-  async run(context: ScenarioContext): Promise<ScenarioRunResult> {
+  async run(context: ScenarioContext) {
     await Scenario.current.set({ scenario: this, context }, async () => {
       context.reporter.onScenarioStart(this, context);
 
@@ -60,7 +58,5 @@ export class Scenario {
         context.reporter.onScenarioComplete(this, context);
       }
     });
-
-    return { scenario: this };
   }
 }

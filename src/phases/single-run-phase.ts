@@ -1,5 +1,5 @@
 import { Phase, PhaseContext, PhaseRunResult } from "../phases";
-import { Scenario, ScenarioContext } from "../scenarios";
+import { Scenario } from "../scenarios";
 
 export interface SingleRunPhaseConfig {
   name: string;
@@ -8,25 +8,23 @@ export interface SingleRunPhaseConfig {
 
 export class SingleRunPhase implements Phase {
   public readonly name = this.config.name;
+  public readonly scenario = this.config.scenario;
 
   constructor(private config: SingleRunPhaseConfig) {}
 
   async run(context: PhaseContext): Promise<PhaseRunResult> {
     await context.reporter.onPhaseStart(this, context);
 
-    const scenarioResult = await this.runScenario(context);
+    await this.runScenario(context);
 
     await context.reporter.onPhaseComplete(this, context);
 
-    return {
-      phase: this,
-      scenarioResults: [scenarioResult]
-    };
+    return { phase: this };
   }
 
   async runScenario(context: PhaseContext) {
-    const scenarioRun = new ScenarioContext(this, context.reporter);
+    const { reporterData } = await context.executor.runSingle(this.name, {});
 
-    return this.config.scenario.run(scenarioRun);
+    await context.reporter.onDataFromWorker(reporterData);
   }
 }

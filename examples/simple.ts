@@ -7,15 +7,15 @@ import {
 } from '../src';
 
 const scenario = new Scenario('Just wondering', async (actions) => {
-  await actions.fetch('http://example.com');
-  await actions.fetch('http://example.com');
+  await actions.fetch('http://localhost:8080');
+  await actions.fetch('http://localhost:8080');
 });
 
-const run = new TestRun({
+export default new TestRun({
   reporter: new ConsoleReporter(),
 
   httpInterceptor: {
-    host: 'example.com'
+    host: 'localhost:8080'
   },
 
   phases: [
@@ -27,10 +27,8 @@ const run = new TestRun({
     new ConstantConcurrencyPhase({
       name: 'full-load',
       durationSeconds: 25,
-      concurrency: 5,
+      concurrency: 20,
       scenario
     })
   ]
 });
-
-run.execute();

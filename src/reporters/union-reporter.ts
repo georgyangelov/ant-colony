@@ -1,11 +1,23 @@
 import { RequestActionInfo } from "../actions";
 import { Phase, PhaseContext } from "../phases";
-import { Reporter } from "../reporter";
+import { Reporter, WorkerReporter } from "../reporter";
 import { Scenario, ScenarioContext } from "../scenarios";
 import { TestRun } from "../tests";
 
-export class UnionReporter implements Reporter {
-  constructor(private reporters: Reporter[]) {}
+// [
+//   Reporter<string>,
+//   Reporter<number>
+// ]
+//
+// ->
+//
+// Reporter<[string, number]>
+
+// type DataTypeOfReporter<W> = W extends Reporter<infer R> ? R : never;
+// type ToWorkerReporter<ReporterT> = WorkerReporter<DataTypeOfReporter<ReporterT>>;
+
+export class UnionReporter implements Reporter<any> {
+  constructor(private reporters: Reporter<any>[]) {}
 
   async onRunStart(run: TestRun) {
     await Promise.all(this.reporters.map(reporter => reporter.onRunStart(run)));
@@ -23,8 +35,29 @@ export class UnionReporter implements Reporter {
   async onPhaseComplete(phase: Phase, context: PhaseContext) {
     await Promise.all(this.reporters.map(reporter => reporter.onPhaseComplete(phase, context)));
   }
-  async onPhaseError(phase: Phase, context: PhaseContext) {
-    await Promise.all(this.reporters.map(reporter => reporter.onPhaseError(phase, context)));
+
+  workerReporterFor(test: TestRun, phase: Phase) {
+    return new UnionWorkerReporter(this.reporters.map(_ => _.workerReporterFor(test, phase)));
+  }
+
+  async onDataFromWorker(data: any) {
+    await Promise.all(
+      this.reporters.map((reporter, i) =>
+        reporter.onDataFromWorker(data[i])
+      )
+    );
+  }
+}
+
+class UnionWorkerReporter implements WorkerReporter<any> {
+  constructor(private reporters: WorkerReporter<any>[]) {}
+
+  async init() {
+    await Promise.all(this.reporters.map(reporter => reporter.init()));
+  }
+
+  async complete() {
+    return Promise.all(this.reporters.map(reporter => reporter.complete())) as any;
   }
 
   onScenarioStart(scenario: Scenario, context: ScenarioContext) {

@@ -1,5 +1,6 @@
+import { times } from "lodash";
 import { Phase, PhaseContext, PhaseRunResult } from "../phases";
-import { Scenario, ScenarioContext, ScenarioRunResult } from "../scenarios";
+import { Scenario } from "../scenarios";
 
 export interface ConstantConcurrencyPhaseConfig {
   name: string;
@@ -10,81 +11,53 @@ export interface ConstantConcurrencyPhaseConfig {
 
 export class ConstantConcurrencyPhase implements Phase {
   public readonly name = this.config.name;
+  public readonly scenario = this.config.scenario;
 
   constructor(private config: ConstantConcurrencyPhaseConfig) {}
 
   async run(context: PhaseContext): Promise<PhaseRunResult> {
     await context.reporter.onPhaseStart(this, context);
 
-    const startTimeMs = Date.now();
-    const runningScenarios = new Map<ScenarioContext, Promise<[ScenarioContext, ScenarioRunResult]>>();
-    const results: ScenarioRunResult[] = [];
-
-    for (let i = 0; i < this.config.concurrency; i++) {
-      const scenarioRun = new ScenarioContext(this, context.reporter);
-
-      runningScenarios.set(
-        scenarioRun,
-        this.config.scenario.run(scenarioRun).then(
-          (result) => [scenarioRun, result],
-          (error) => [scenarioRun, error]
-        )
-      );
-    }
-
-    while (runningScenarios.size > 0) {
-      // try {
-      const [scenarioRun, result] = await Promise.race(runningScenarios.values());
-      // } catch (error) {
-      //   if (Array.isArray(error)) {
-      //     const [scenarioRun, scenarioError] = error;
-      //   }
-      //
-      //   throw error;
-      // }
-
-      runningScenarios.delete(scenarioRun);
-      results.push(result);
-
-      const hasMoreTime = (Date.now() - startTimeMs) / 1000 < this.config.durationSeconds;
-      const needsMoreConcurrency = runningScenarios.size < this.config.concurrency;
-
-      if (hasMoreTime && needsMoreConcurrency) {
-        const scenarioRun = new ScenarioContext(this, context.reporter);
-
-        runningScenarios.set(
-          scenarioRun,
-          this.config.scenario.run(scenarioRun).then(
-            (result) => [scenarioRun, result],
-            (error) => [scenarioRun, error]
-          )
-        );
-      }
-    }
+    const arrayOfResults = await Promise.all(
+      times(this.config.concurrency, () => this.scenarioThread(context))
+    );
 
     // TODO: In finally?
     await context.reporter.onPhaseComplete(this, context);
 
     return {
       phase: this,
-      scenarioResults: results
+      // scenarioResults: flatten(arrayOfResults)
     };
   }
 
-  // private runNewScenario(
-  //   startTimeMs: number,
-  //   runningScenarios: Set<ScenarioRun>
-  // ) {
-  //   const scenarioRun = new ScenarioRun();
-  //   runningScenarios.add(scenarioRun);
+  private async scenarioThread(context: PhaseContext) {
+    // TODO: Make this run in batches of up to 1 minute so that reporting
+    //       is more responsive.
+    const { reporterData } = await context.executor.runQueuedUntil(
+      this.name,
+      {},
+      Date.now() + this.config.durationSeconds * 1000
+    );
+
+    await context.reporter.onDataFromWorker(reporterData);
+  }
+
+  // private async scenarioThread(context: PhaseContext) {
+  //   const startTimeMs = Date.now();
+  //   const results = [];
   //
-  //   this.config.scenario.run(scenarioRun).finally(() => {
-  //     const hasMoreTime = (Date.now() - startTimeMs) / 1000 < this.config.durationSeconds;
-  //     const needsMoreConcurrency = runningScenarios.size < this.config.concurrency;
+  //   while ((Date.now() - startTimeMs) / 1000 < this.config.durationSeconds) {
+  //     const [result] = await context.executor.execute(
+  //       this.config.scenario,
+  //       this,
+  //       context,
+  //       1
+  //     );
   //
-  //     if (hasMoreTime && needsMoreConcurrency) {
-  //       this.runNewScenario(startTimeMs, runningScenarios);
-  //     }
-  //   });
+  //     results.push(result!);
+  //   }
+  //
+  //   return results;
   // }
 }

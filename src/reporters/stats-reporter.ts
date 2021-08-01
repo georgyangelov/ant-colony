@@ -1,26 +1,28 @@
 import { RequestActionInfo } from "../actions";
 import { Phase, PhaseContext } from "../phases";
-import { Reporter } from "../reporter";
+import { Reporter, WorkerReporter } from "../reporter";
 import { Scenario, ScenarioContext } from "../scenarios";
 import { TestRun } from "../tests";
 
-export interface RequestTiming {
-  startedAt: number;
-  responseTime: number;
-  statusCode: number | undefined;
-}
-
-export interface PhaseStats {
+export interface PhaseStats extends PhaseWorkerStats {
   phase: Phase;
 
   startTime: Date;
   endTime: Date;
-
-  scenarioCount: number;
-  requestTimings: RequestTiming[];
 }
 
-export class StatsReporter implements Reporter {
+export type PhaseWorkerStats = {
+  scenarioCount: number;
+  requestTimings: RequestTiming[];
+};
+
+export type RequestTiming = {
+  startedAt: number;
+  responseTime: number;
+  statusCode: number | null;
+};
+
+export class StatsReporter implements Reporter<PhaseWorkerStats> {
   stats: PhaseStats[] = [];
   currentPhase!: Omit<PhaseStats, 'endTime'>;
 
@@ -45,17 +47,41 @@ export class StatsReporter implements Reporter {
   }
   onPhaseError(phase: Phase, context: PhaseContext) {}
 
+  workerReporterFor(test: TestRun, phase: Phase) {
+    return new StatsWorkerReporter();
+  }
+
+  onDataFromWorker(data: PhaseWorkerStats): void | Promise<void> {
+    this.currentPhase.scenarioCount += data.scenarioCount;
+
+    data.requestTimings.forEach(timing => {
+      this.currentPhase.requestTimings.push(timing);
+    });
+  }
+}
+
+export class StatsWorkerReporter implements WorkerReporter<PhaseWorkerStats> {
+  private stats: PhaseWorkerStats = {
+    requestTimings: [],
+    scenarioCount: 0
+  };
+
+  init() {}
+  complete() {
+    return this.stats;
+  }
+
   onScenarioStart(scenario: Scenario, context: ScenarioContext) {
-    this.currentPhase.scenarioCount++;
+    this.stats.scenarioCount++;
   }
   onScenarioComplete(scenario: Scenario, context: ScenarioContext) {}
   onScenarioError(scenario: Scenario, context: ScenarioContext) {}
 
   onRequestComplete(request: RequestActionInfo, scenario: Scenario, context: ScenarioContext) {
-    this.currentPhase.requestTimings.push({
+    this.stats.requestTimings.push({
       startedAt: request.startedAtUnixMs,
       responseTime: request.responseTimeMs,
-      statusCode: request.statusCode
+      statusCode: request.statusCode ?? null
     });
   }
 }

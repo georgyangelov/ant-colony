@@ -1,32 +1,22 @@
 import { groupBy, mapValues, sumBy } from "lodash";
 import { RequestActionInfo } from "../actions";
 import { Phase, PhaseContext } from "../phases";
-import { Reporter } from "../reporter";
+import { Reporter, WorkerReporter } from "../reporter";
 import { Scenario, ScenarioContext } from "../scenarios";
 import { TestRun } from "../tests";
-import { StatsReporter } from "./stats-reporter";
+import { PhaseWorkerStats, StatsReporter, StatsWorkerReporter } from "./stats-reporter";
 import percentile from 'percentile';
 
-export class ConsoleReporter implements Reporter {
+export class ConsoleReporter implements Reporter<PhaseWorkerStats> {
   private statsReporter = new StatsReporter();
-
-  private interval?: NodeJS.Timer;
 
   onRunStart(run: TestRun) {
     console.log('Load Test Start');
-
-    this.interval = setInterval(() => {
-      this.printCurrentPhaseStats(false);
-    }, 10 * 1000);
 
     this.statsReporter.onRunStart(run);
   }
   onRunComplete(run: TestRun) {
     this.statsReporter.onRunComplete(run);
-
-    if (this.interval) {
-      clearInterval(this.interval);
-    }
 
     console.log('Load Test Complete');
   }
@@ -38,29 +28,24 @@ export class ConsoleReporter implements Reporter {
     this.statsReporter.onPhaseStart(phase, context);
   }
   onPhaseComplete(phase: Phase, context: PhaseContext) {
-    this.printCurrentPhaseStats(true);
+    this.printCurrentPhaseStats();
+    console.log('Phase complete', phase.name);
 
     this.statsReporter.onPhaseComplete(phase, context);
-
-    console.log('\nPhase complete', phase.name);
   }
   onPhaseError(phase: Phase, context: PhaseContext) {}
 
-  onScenarioStart(scenario: Scenario, context: ScenarioContext) {
-    this.statsReporter.onScenarioStart(scenario, context);
-  }
-  onScenarioComplete(scenario: Scenario, context: ScenarioContext) {
-    this.statsReporter.onScenarioComplete(scenario, context);
-  }
-  onScenarioError(scenario: Scenario, context: ScenarioContext) {}
+  workerReporterFor(test: TestRun, phase: Phase) {
+    const statsWorkerReporter = this.statsReporter.workerReporterFor(test, phase);
 
-  onRequestComplete(request: RequestActionInfo, scenario: Scenario, context: ScenarioContext) {
-    this.statsReporter.onRequestComplete(request, scenario, context);
-
-    process.stdout.write('.');
+    return new ConsoleWorkerReporter(statsWorkerReporter);
   }
 
-  private printCurrentPhaseStats(phaseComplete: boolean) {
+  onDataFromWorker(data: PhaseWorkerStats) {
+    return this.statsReporter.onDataFromWorker(data);
+  }
+
+  private printCurrentPhaseStats() {
     const stats = this.statsReporter.currentPhase;
     if (!stats) {
       return;
@@ -69,14 +54,13 @@ export class ConsoleReporter implements Reporter {
     const averageTimeMs =
       sumBy(stats.requestTimings, _ => _.responseTime) / stats.requestTimings.length;
 
-    const [p90, p95, p98, p99] = percentile(
-      [90, 95, 98, 99],
+    const [p90, p95, p98, p99, max] = percentile(
+      [90, 95, 98, 99, 100],
       stats.requestTimings.map(_ => _.responseTime)
     ) as number[];
 
     const info = {
       phase: stats.phase.name,
-      phaseComplete,
 
       scenarioCount: stats.scenarioCount,
       requestCount: stats.requestTimings.length,
@@ -88,11 +72,38 @@ export class ConsoleReporter implements Reporter {
 
       responseTimesMs: {
         average: Math.round(averageTimeMs),
-        p90, p95, p98, p99
+        p90, p95, p98, p99, max
       }
     };
 
     console.log();
     console.log(info);
+  }
+}
+
+class ConsoleWorkerReporter implements WorkerReporter<PhaseWorkerStats> {
+  constructor(private statsWorker: StatsWorkerReporter) {}
+
+  init() {
+    return this.statsWorker.init();
+  }
+  complete() {
+    return this.statsWorker.complete();
+  }
+
+  onScenarioStart(scenario: Scenario, context: ScenarioContext) {
+    this.statsWorker.onScenarioStart(scenario, context);
+  }
+  onScenarioComplete(scenario: Scenario, context: ScenarioContext) {
+    this.statsWorker.onScenarioComplete(scenario, context);
+  }
+  onScenarioError(scenario: Scenario, context: ScenarioContext) {
+    this.statsWorker.onScenarioError(scenario, context);
+  }
+
+  onRequestComplete(request: RequestActionInfo, scenario: Scenario, context: ScenarioContext) {
+    this.statsWorker.onRequestComplete(request, scenario, context);
+
+    process.stdout.write('.');
   }
 }
