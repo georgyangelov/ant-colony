@@ -1,17 +1,16 @@
 import { Executor } from "./executor";
 import { Reporter } from "./reporter";
-import { Scenario } from "./scenarios";
+import { IScenario } from "./scenarios";
 
 export interface Phase {
   name: string;
-  scenario: Scenario;
+  scenario: IScenario;
 
   run(context: PhaseContext): Promise<PhaseRunResult>;
 }
 
 export interface PhaseRunResult {
   phase: Phase;
-  // scenarioResults: ScenarioRunResult[];
 }
 
 export class PhaseContext {

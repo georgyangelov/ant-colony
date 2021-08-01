@@ -1,9 +1,9 @@
 import { Phase, PhaseContext, PhaseRunResult } from "../phases";
-import { Scenario } from "../scenarios";
+import { IScenario } from "../scenarios";
 
 export interface SingleRunPhaseConfig {
   name: string;
-  scenario: Scenario;
+  scenario: IScenario;
 }
 
 export class SingleRunPhase implements Phase {

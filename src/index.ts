@@ -21,3 +21,5 @@ export * from './reporters/console-reporter';
 export * from './executors/async-executor';
 export * from './executors/aws-lambda-executor';
 export * from './executors/worker-thread-executor';
+
+export * from './scenarios/random-scenario';

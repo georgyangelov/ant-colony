@@ -12,11 +12,11 @@ export class ScenarioContext {
   ) {}
 }
 
-// export interface ScenarioRunResult {
-//   scenario: Scenario;
-// }
+export interface IScenario {
+  run(context: ScenarioContext): Promise<void>;
+}
 
-export class Scenario {
+export class Scenario implements IScenario {
   static current = new ContinuationLocal<{ scenario: Scenario, context: ScenarioContext }>();
 
   static onInterceptedRequest({ request, response, startedAtUnixMs, responseTimeMs }: InterceptedResponse) {

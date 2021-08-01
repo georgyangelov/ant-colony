@@ -2,16 +2,26 @@ import {
   ConstantConcurrencyPhase,
   Scenario,
   SingleRunPhase,
-  TestRun,
-  ConsoleReporter
+  ConsoleReporter,
+  LoadTest,
+  RandomScenario
 } from '../src';
 
-const scenario = new Scenario('Just wondering', async (actions) => {
+const fetchOnce = new Scenario('Fetch once', async actions => {
+  await actions.fetch('http://localhost:8080');
+});
+
+const fetchTwice = new Scenario('Fetch twice', async actions => {
   await actions.fetch('http://localhost:8080');
   await actions.fetch('http://localhost:8080');
 });
 
-export default new TestRun({
+const scenario = new RandomScenario([
+  { scenario: fetchOnce, weight: 2 },
+  { scenario: fetchTwice, weight: 1 }
+]);
+
+export default new LoadTest({
   reporter: new ConsoleReporter(),
 
   httpInterceptor: {

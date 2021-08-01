@@ -1,12 +1,12 @@
 import { times } from "lodash";
 import { Phase, PhaseContext, PhaseRunResult } from "../phases";
-import { Scenario } from "../scenarios";
+import { IScenario } from "../scenarios";
 
 export interface ConstantConcurrencyPhaseConfig {
   name: string;
   durationSeconds: number;
   concurrency: number;
-  scenario: Scenario;
+  scenario: IScenario;
 }
 
 export class ConstantConcurrencyPhase implements Phase {
