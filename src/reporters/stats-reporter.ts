@@ -16,11 +16,11 @@ export type PhaseWorkerStats = {
   requestTimings: RequestTiming[];
 };
 
-export type RequestTiming = {
-  startedAt: number;
-  responseTime: number;
-  statusCode: number | null;
-};
+export type RequestTiming = [
+  /* startedAt */    number,
+  /* responseTime */ number,
+  /* statusCode */   number | null
+];
 
 export class StatsReporter implements Reporter<PhaseWorkerStats> {
   stats: PhaseStats[] = [];
@@ -78,10 +78,10 @@ export class StatsWorkerReporter implements WorkerReporter<PhaseWorkerStats> {
   onScenarioError(scenario: Scenario, context: ScenarioContext) {}
 
   onRequestComplete(request: RequestActionInfo, scenario: Scenario, context: ScenarioContext) {
-    this.stats.requestTimings.push({
-      startedAt: request.startedAtUnixMs,
-      responseTime: request.responseTimeMs,
-      statusCode: request.statusCode ?? null
-    });
+    this.stats.requestTimings.push([
+      request.startedAtUnixMs,
+      request.responseTimeMs,
+      request.statusCode ?? null
+    ]);
   }
 }

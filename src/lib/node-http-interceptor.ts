@@ -58,7 +58,7 @@ export const NodeHTTPInterceptor = {
       return clientRequest;
     };
 
-    const originalHttpsRequest: any = http.request;
+    const originalHttpsRequest: any = https.request;
     (https as any).request = function request(this: any, url: any, options: any, callback: any) {
       const clientRequest = originalHttpsRequest.apply(this, [url, options, callback]);
 

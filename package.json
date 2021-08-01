@@ -20,13 +20,13 @@
     "package.json"
   ],
   "dependencies": {
+    "@aws-sdk/client-lambda": "^3.24.0",
     "commander": "^8.1.0",
     "eventemitter3": "^4.0.7",
     "lodash": "^4.17.21",
     "node-fetch": "^2.6.1",
     "percentile": "^1.5.0",
-    "threads": "^1.6.5",
-    "typescript": "^4.3.5"
+    "threads": "^1.6.5"
   },
   "devDependencies": {
     "@types/eventemitter3": "^2.0.2",
@@ -36,6 +36,7 @@
     "@types/node-fetch": "^2.5.12",
     "jest": "^27.0.6",
     "ts-jest": "^27.0.4",
-    "ts-node": "^10.1.0"
+    "ts-node": "^10.1.0",
+    "typescript": "^4.3.5"
   }
 }

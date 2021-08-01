@@ -52,11 +52,11 @@ export class ConsoleReporter implements Reporter<PhaseWorkerStats> {
     }
 
     const averageTimeMs =
-      sumBy(stats.requestTimings, _ => _.responseTime) / stats.requestTimings.length;
+      sumBy(stats.requestTimings, _ => _[1]) / stats.requestTimings.length;
 
     const [p90, p95, p98, p99, max] = percentile(
       [90, 95, 98, 99, 100],
-      stats.requestTimings.map(_ => _.responseTime)
+      stats.requestTimings.map(_ => _[1])
     ) as number[];
 
     const info = {
@@ -66,7 +66,7 @@ export class ConsoleReporter implements Reporter<PhaseWorkerStats> {
       requestCount: stats.requestTimings.length,
 
       responses: mapValues(
-        groupBy(stats.requestTimings, _ => _.statusCode),
+        groupBy(stats.requestTimings, _ => _[2]),
         _ => _.length
       ),
 

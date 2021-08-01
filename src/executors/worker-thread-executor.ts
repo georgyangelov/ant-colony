@@ -1,4 +1,6 @@
+import { existsSync } from 'fs';
 import { flatten, times } from 'lodash';
+import path from 'path';
 import { ModuleThread, Pool, spawn, Worker } from 'threads';
 import { ExecutionResult, Executor, ExecutorRunContext } from "../executor";
 import { TestRun } from "../tests";
@@ -36,7 +38,7 @@ export class WorkerThreadExecutor implements Executor {
       };
 
       const worker = new Worker(
-        '../bin/worker.ts',
+        this.findWorkerFile(),
         { workerData: data }
       );
 
@@ -48,6 +50,19 @@ export class WorkerThreadExecutor implements Executor {
     });
 
     await this.pool.settled(true);
+  }
+
+  private findWorkerFile() {
+    const jsFile = '../bin/worker.js';
+    const tsFile = '../bin/worker.ts';
+
+    if (existsSync(path.resolve(__dirname, jsFile))) {
+      return jsFile;
+    } else if (existsSync(path.resolve(__dirname, jsFile))) {
+      return tsFile;
+    } else {
+      throw new Error('Cannot find worker file');
+    }
   }
 
   async stop(): Promise<void> {

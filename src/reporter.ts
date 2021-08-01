@@ -4,12 +4,12 @@ import { Scenario, ScenarioContext } from "./scenarios";
 import { TestRun } from "./tests";
 
 type JSONValue = string | boolean | null | number;
-type JSONArray = (JSONObject | JSONValue)[];
+type JSONArray = (JSONValue | JSONArray | JSONObject)[];
 interface JSONObject {
   [k: string]: JSONValue | JSONObject | JSONArray;
 }
 
-export type BaseWorkerData = JSONValue | JSONObject | JSONArray;
+export type BaseWorkerData = JSONValue | JSONArray | JSONObject;
 
 export interface Reporter<WorkerDataT extends BaseWorkerData> {
   onRunStart(run: TestRun): void | Promise<void>;

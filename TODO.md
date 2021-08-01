@@ -1,0 +1,11 @@
+- Project generator
+- Some docs
+- Better split of parallel work for lambdas
+- Better console status for lambda executions
+- Support for data / setup phase
+- Better fetch action:
+    - Configurable connection pooling
+- Error handling
+- Lambda error handling
+- Improve CLI interface
+- GitHub repo
