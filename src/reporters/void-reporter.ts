@@ -1,6 +1,6 @@
 import { Phase } from "../phases";
 import { Reporter, WorkerReporter } from "../reporter";
-import { TestRun } from "../tests";
+import { LoadTest } from "../tests";
 
 export class VoidReporter implements Reporter<null> {
   onRunStart() {}
@@ -10,7 +10,7 @@ export class VoidReporter implements Reporter<null> {
   onPhaseStart() {}
   onPhaseComplete() {}
 
-  workerReporterFor(test: TestRun, phase: Phase) {
+  workerReporterFor(test: LoadTest, phase: Phase) {
     return new VoidWorkerReporter();
   }
 

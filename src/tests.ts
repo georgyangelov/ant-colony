@@ -19,14 +19,13 @@ export interface TestRunResult {
   phaseResults: PhaseRunResult[];
 }
 
-// TODO: Rename to `LoadTest`
-export class TestRun {
+export class LoadTest {
   public readonly phasesByName = new Map(
     this.config.phases.map(phase => [phase.name, phase])
   );
 
   constructor(public config: TestRunConfig) {
-    TestRun.validateConfig(this.config);
+    LoadTest.validateConfig(this.config);
   }
 
   static validateConfig(config: TestRunConfig) {

@@ -1,4 +1,3 @@
-- Rename to FireAnts
 - Project generator
 - Some docs
 - Better split of parallel work for lambdas
@@ -10,3 +9,10 @@
 - Lambda error handling
 - Improve CLI interface
 - GitHub repo
+- More phase types
+- RandomScenario
+- Split lambda executions to ~1 min of execution
+- Ability to cancel execution on Ctrl+C
+- Add eslint and prettier?
+- CloudWatch reporter
+- Example with SDK?

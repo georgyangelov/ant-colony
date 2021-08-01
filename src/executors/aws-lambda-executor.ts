@@ -1,6 +1,6 @@
 import { InvocationType, InvokeCommand, LambdaClient,  } from "@aws-sdk/client-lambda";
 import { ExecutionResult, Executor, ExecutorRunContext } from "../executor";
-import { TestRun } from "../tests";
+import { LoadTest } from "../tests";
 import { AsyncExecutor } from "./async-executor";
 
 export interface AWSLambdaConfig {
@@ -33,7 +33,7 @@ export class AWSLambdaExecutor implements Executor {
 
   static async lambdaHandler(event: LambdaPayload, context: any): Promise<LambdaResult> {
     const modulePath = event.testModulePath.replace(/\.ts$/, '.js');
-    const test = require(modulePath).default as TestRun;
+    const test = require(modulePath).default as LoadTest;
 
     const stopIntercepting = test._startInterceptingHTTP();
 

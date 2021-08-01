@@ -2,7 +2,7 @@ import { RequestActionInfo } from "../actions";
 import { Phase, PhaseContext } from "../phases";
 import { Reporter, WorkerReporter } from "../reporter";
 import { Scenario, ScenarioContext } from "../scenarios";
-import { TestRun } from "../tests";
+import { LoadTest } from "../tests";
 
 // [
 //   Reporter<string>,
@@ -19,13 +19,13 @@ import { TestRun } from "../tests";
 export class UnionReporter implements Reporter<any> {
   constructor(private reporters: Reporter<any>[]) {}
 
-  async onRunStart(run: TestRun) {
+  async onRunStart(run: LoadTest) {
     await Promise.all(this.reporters.map(reporter => reporter.onRunStart(run)));
   }
-  async onRunComplete(run: TestRun) {
+  async onRunComplete(run: LoadTest) {
     await Promise.all(this.reporters.map(reporter => reporter.onRunComplete(run)));
   }
-  async onRunError(run: TestRun) {
+  async onRunError(run: LoadTest) {
     await Promise.all(this.reporters.map(reporter => reporter.onRunError(run)));
   }
 
@@ -36,7 +36,7 @@ export class UnionReporter implements Reporter<any> {
     await Promise.all(this.reporters.map(reporter => reporter.onPhaseComplete(phase, context)));
   }
 
-  workerReporterFor(test: TestRun, phase: Phase) {
+  workerReporterFor(test: LoadTest, phase: Phase) {
     return new UnionWorkerReporter(this.reporters.map(_ => _.workerReporterFor(test, phase)));
   }
 

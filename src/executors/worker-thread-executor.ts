@@ -3,14 +3,14 @@ import { flatten, times } from 'lodash';
 import path from 'path';
 import { ModuleThread, Pool, spawn, Worker } from 'threads';
 import { ExecutionResult, Executor, ExecutorRunContext } from "../executor";
-import { TestRun } from "../tests";
+import { LoadTest } from "../tests";
 import { AsyncExecutor } from "./async-executor";
 
 export interface WorkerData {
   testModulePath: string;
 }
 
-export function newWorkerThread(test: TestRun) {
+export function newWorkerThread(test: LoadTest) {
   const asyncExecutor = new AsyncExecutor(test);
 
   return {

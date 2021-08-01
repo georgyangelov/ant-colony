@@ -1,7 +1,7 @@
 import { RequestActionInfo } from "./actions";
 import { Phase, PhaseContext } from "./phases";
 import { Scenario, ScenarioContext } from "./scenarios";
-import { TestRun } from "./tests";
+import { LoadTest } from "./tests";
 
 type JSONValue = string | boolean | null | number;
 type JSONArray = (JSONValue | JSONArray | JSONObject)[];
@@ -12,14 +12,14 @@ interface JSONObject {
 export type BaseWorkerData = JSONValue | JSONArray | JSONObject;
 
 export interface Reporter<WorkerDataT extends BaseWorkerData> {
-  onRunStart(run: TestRun): void | Promise<void>;
-  onRunComplete(run: TestRun): void | Promise<void>;
-  onRunError(run: TestRun): void | Promise<void>;
+  onRunStart(run: LoadTest): void | Promise<void>;
+  onRunComplete(run: LoadTest): void | Promise<void>;
+  onRunError(run: LoadTest): void | Promise<void>;
 
   onPhaseStart(phase: Phase, context: PhaseContext): void | Promise<void>;
   onPhaseComplete(phase: Phase, context: PhaseContext): void | Promise<void>;
 
-  workerReporterFor(test: TestRun, phase: Phase): WorkerReporter<WorkerDataT>;
+  workerReporterFor(test: LoadTest, phase: Phase): WorkerReporter<WorkerDataT>;
   onDataFromWorker(data: WorkerDataT): void | Promise<void>;
 }
 

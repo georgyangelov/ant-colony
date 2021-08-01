@@ -3,11 +3,11 @@ import { ExecutionResult, Executor, ExecutorRunContext } from "../executor";
 import { Phase } from "../phases";
 import { BaseWorkerData, WorkerReporter } from "../reporter";
 import { ScenarioContext } from "../scenarios";
-import { TestRun } from "../tests";
+import { LoadTest } from "../tests";
 
 export class AsyncExecutor implements Executor {
   constructor(
-    private test: TestRun
+    private test: LoadTest
   ) {}
 
   async start(): Promise<void> {}

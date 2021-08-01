@@ -5,7 +5,7 @@ import { readFileSync } from 'fs';
 import path from 'path';
 import { AsyncExecutor } from '../executors/async-executor';
 import { AWSLambdaExecutor } from '../executors/aws-lambda-executor';
-import { TestRun } from "../tests";
+import { LoadTest } from "../tests";
 
 try {
   require('ts-node/register');
@@ -19,7 +19,7 @@ program
   .description('Run a test script')
   .action(async (testFilePath) => {
     const absolutePath = path.resolve(process.cwd(), testFilePath);
-    const testRun = require(absolutePath).default as TestRun;
+    const testRun = require(absolutePath).default as LoadTest;
 
     await testRun.execute(new AsyncExecutor(testRun));
     // await testRun.execute(new WorkerThreadExecutor(absolutePath, 10));
@@ -41,7 +41,7 @@ program
     };
 
     const absolutePath = path.resolve(process.cwd(), testFilePath);
-    const testRun = require(absolutePath).default as TestRun;
+    const testRun = require(absolutePath).default as LoadTest;
 
     await testRun.execute(new AWSLambdaExecutor(testFilePath, lambdaConfig));
   });

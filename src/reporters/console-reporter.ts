@@ -3,24 +3,24 @@ import { RequestActionInfo } from "../actions";
 import { Phase, PhaseContext } from "../phases";
 import { Reporter, WorkerReporter } from "../reporter";
 import { Scenario, ScenarioContext } from "../scenarios";
-import { TestRun } from "../tests";
+import { LoadTest } from "../tests";
 import { PhaseWorkerStats, StatsReporter, StatsWorkerReporter } from "./stats-reporter";
 import percentile from 'percentile';
 
 export class ConsoleReporter implements Reporter<PhaseWorkerStats> {
   private statsReporter = new StatsReporter();
 
-  onRunStart(run: TestRun) {
+  onRunStart(run: LoadTest) {
     console.log('Load Test Start');
 
     this.statsReporter.onRunStart(run);
   }
-  onRunComplete(run: TestRun) {
+  onRunComplete(run: LoadTest) {
     this.statsReporter.onRunComplete(run);
 
     console.log('Load Test Complete');
   }
-  onRunError(run: TestRun) {}
+  onRunError(run: LoadTest) {}
 
   onPhaseStart(phase: Phase, context: PhaseContext) {
     console.log('Phase start', phase.name);
@@ -35,7 +35,7 @@ export class ConsoleReporter implements Reporter<PhaseWorkerStats> {
   }
   onPhaseError(phase: Phase, context: PhaseContext) {}
 
-  workerReporterFor(test: TestRun, phase: Phase) {
+  workerReporterFor(test: LoadTest, phase: Phase) {
     const statsWorkerReporter = this.statsReporter.workerReporterFor(test, phase);
 
     return new ConsoleWorkerReporter(statsWorkerReporter);

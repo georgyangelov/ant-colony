@@ -1,6 +1,6 @@
 import { Phase, PhaseContext } from "../phases";
 import { Reporter, WorkerReporter } from "../reporter";
-import { TestRun } from "../tests";
+import { LoadTest } from "../tests";
 
 type Counters = {
   phases: 0,
@@ -15,9 +15,9 @@ export class CountingReporter implements Reporter<Counters> {
     requests: 0
   };
 
-  onRunStart(run: TestRun) {}
-  onRunComplete(run: TestRun) {}
-  onRunError(run: TestRun) {}
+  onRunStart(run: LoadTest) {}
+  onRunComplete(run: LoadTest) {}
+  onRunError(run: LoadTest) {}
 
   onPhaseStart(phase: Phase, context: PhaseContext) {}
   onPhaseComplete(phase: Phase, context: PhaseContext) {
@@ -25,7 +25,7 @@ export class CountingReporter implements Reporter<Counters> {
   }
   onPhaseError(phase: Phase, context: PhaseContext) {}
 
-  workerReporterFor(test: TestRun, phase: Phase) {
+  workerReporterFor(test: LoadTest, phase: Phase) {
     return new CountingWorkerReporter();
   }
 
