@@ -1682,9 +1682,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ants@workspace:.":
+"ant-colony@workspace:.":
   version: 0.0.0-use.local
-  resolution: "ants@workspace:."
+  resolution: "ant-colony@workspace:."
   dependencies:
     "@aws-sdk/client-lambda": ^3.24.0
     "@types/eventemitter3": ^2.0.2
@@ -1703,6 +1703,7 @@ __metadata:
     ts-node: ^10.1.0
     typescript: ^4.3.5
   bin:
+    ant-colony: dist/bin/ants.js
     ants: dist/bin/ants.js
   languageName: unknown
   linkType: soft
