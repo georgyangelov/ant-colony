@@ -5,11 +5,8 @@ import { readFileSync } from 'fs';
 import path from 'path';
 import { AsyncExecutor } from '../executors/async-executor';
 import { AWSLambdaExecutor } from '../executors/aws-lambda-executor';
+import { WorkerThreadExecutor } from '../executors/worker-thread-executor';
 import { LoadTest } from "../tests";
-
-try {
-  require('ts-node/register');
-} catch {}
 
 const program = new Command();
 
@@ -18,11 +15,10 @@ program
   // .option('--workers')
   .description('Run a test script')
   .action(async (testFilePath) => {
-    const absolutePath = path.resolve(process.cwd(), testFilePath);
-    const testRun = require(absolutePath).default as LoadTest;
+    const loadTest = requireLoadTest(testFilePath);
 
-    await testRun.execute(new AsyncExecutor(testRun));
-    // await testRun.execute(new WorkerThreadExecutor(absolutePath, 10));
+    await loadTest.execute(new AsyncExecutor(loadTest));
+    // await loadTest.execute(new WorkerThreadExecutor(absolutePath, 10));
   });
 
 program
@@ -40,10 +36,32 @@ program
       functionName: serverlessState.service.functions.fireAntWorker.name as string
     };
 
-    const absolutePath = path.resolve(process.cwd(), testFilePath);
-    const testRun = require(absolutePath).default as LoadTest;
+    const loadTest = requireLoadTest(testFilePath);
 
-    await testRun.execute(new AWSLambdaExecutor(testFilePath, lambdaConfig));
+    await loadTest.execute(new AWSLambdaExecutor(testFilePath, lambdaConfig));
   });
+
+function requireLoadTest(testFilePath: string) {
+  if (testFilePath.endsWith('.ts')) {
+    const isRunningInTSNode = !!(process as any)[Symbol.for('ts-node.register.instance')];
+
+    if (!isRunningInTSNode) {
+      try {
+        require('ts-node/register');
+      } catch {
+        throw new Error(
+          'Tried to load a `.ts` test file, but not running in ts-node and ' +
+          'could not require ts-node/register. Please make sure `ts-node` is installed'
+        );
+      }
+    }
+  }
+
+  const absolutePath = path.resolve(process.cwd(), testFilePath);
+
+  // TODO: Check file exists
+
+  return require(absolutePath).default as LoadTest;
+}
 
 program.parse();

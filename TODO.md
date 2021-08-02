@@ -19,3 +19,5 @@
 - CloudWatch reporter
 - Example with SDK?
 - Better tests
+- A way to do assertions
+- Static way to call the actions, like in tests

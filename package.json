@@ -10,7 +10,7 @@
     "test": "jest",
     "ants": "ts-node src/bin/ants.ts",
     "test-server": "ts-node examples/simple-http-server.ts",
-    "example:simple": "yarn run ants -- run ./examples/simple.ts"
+    "example:simple": "yarn run ants -- run ./src/simple.ts"
   },
   "bin": "dist/bin/ants.js",
   "files": [

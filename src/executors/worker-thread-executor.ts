@@ -58,7 +58,7 @@ export class WorkerThreadExecutor implements Executor {
 
     if (existsSync(path.resolve(__dirname, jsFile))) {
       return jsFile;
-    } else if (existsSync(path.resolve(__dirname, jsFile))) {
+    } else if (existsSync(path.resolve(__dirname, tsFile))) {
       return tsFile;
     } else {
       throw new Error('Cannot find worker file');

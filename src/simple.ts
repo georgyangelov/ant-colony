@@ -5,15 +5,15 @@ import {
   ConsoleReporter,
   LoadTest,
   RandomScenario
-} from '../src';
+} from '.';
 
-const fetchOnce = new Scenario('Fetch once', async actions => {
-  await actions.fetch('http://localhost:8080');
+const fetchOnce = new Scenario('Checkout with credit card', async actions => {
+  await actions.fetch('http://example.com');
 });
 
-const fetchTwice = new Scenario('Fetch twice', async actions => {
-  await actions.fetch('http://localhost:8080');
-  await actions.fetch('http://localhost:8080');
+const fetchTwice = new Scenario('Just browsing PLP', async actions => {
+  await actions.fetch('http://example.com');
+  await actions.fetch('http://example.com');
 });
 
 const scenario = new RandomScenario([
@@ -25,7 +25,7 @@ export default new LoadTest({
   reporter: new ConsoleReporter(),
 
   httpInterceptor: {
-    host: 'localhost:8080'
+    host: 'example.com'
   },
 
   phases: [
@@ -36,8 +36,8 @@ export default new LoadTest({
 
     new ConstantConcurrencyPhase({
       name: 'full-load',
-      durationSeconds: 25,
-      concurrency: 20,
+      durationSeconds: 5,
+      concurrency: 10,
       scenario
     })
   ]
