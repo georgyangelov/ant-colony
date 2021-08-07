@@ -19,3 +19,4 @@
 - Better tests
 - A way to do assertions
 - Static way to call the actions, like in tests
+- Do I need a CLI or can it become part of the generated project?

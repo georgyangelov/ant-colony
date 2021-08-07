@@ -5,7 +5,7 @@ import {
   ConsoleReporter,
   LoadTest,
   RandomScenario
-} from '.';
+} from '../src';
 
 const fetchOnce = new Scenario('Checkout with credit card', async actions => {
   await actions.fetch('http://example.com');
