@@ -17,7 +17,7 @@
     "ants": "dist/bin/ants.js"
   },
   "files": [
-    "dist/*",
+    "dist/**/*",
     "README.md",
     "LICENSE",
     "package.json"

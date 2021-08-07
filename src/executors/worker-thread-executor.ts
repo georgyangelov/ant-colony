@@ -79,17 +79,37 @@ export class WorkerThreadExecutor implements Executor {
   async runQueued(
     phaseName: string,
     context: ExecutorRunContext,
-    count: number
-  ): Promise<ExecutionResult> {
-    return this.pool!.queue(thread => thread.runQueued(phaseName, context, count));
+    numberOfRequestsPerQueue: number,
+    numberOfQueues: number
+  ): Promise<ExecutionResult[]> {
+    const results = await Promise.all(times(numberOfQueues).map(() => {
+      return this.pool!.queue(thread => thread.runQueued(
+        phaseName,
+        context,
+        numberOfRequestsPerQueue,
+        1
+      ));
+    }));
+
+    return flatten(results);
   }
 
   async runQueuedFor(
     phaseName: string,
     context: ExecutorRunContext,
-    timeMs: number
-  ): Promise<ExecutionResult> {
-    return this.pool!.queue(thread => thread.runQueuedFor(phaseName, context, timeMs));
+    timeMs: number,
+    numberOfQueues: number
+  ): Promise<ExecutionResult[]> {
+    const results = await Promise.all(times(numberOfQueues).map(() => {
+      return this.pool!.queue(thread => thread.runQueuedFor(
+        phaseName,
+        context,
+        timeMs,
+        1
+      ));
+    }));
+
+    return flatten(results);
   }
 
   async runParallel(

@@ -4,7 +4,7 @@ import { Command } from 'commander';
 import { readFileSync } from 'fs';
 import path from 'path';
 import { AsyncExecutor } from '../executors/async-executor';
-import { AWSLambdaExecutor } from '../executors/aws-lambda-executor';
+import { AWSLambdaConfig, AWSLambdaExecutor } from '../executors/aws-lambda-executor';
 import { WorkerThreadExecutor } from '../executors/worker-thread-executor';
 import { LoadTest } from "../tests";
 
@@ -31,9 +31,12 @@ program
       readFileSync(serverlessStateFile, { encoding: 'utf-8' })
     );
 
-    const lambdaConfig = {
+    const lambdaConfig: AWSLambdaConfig = {
       region: serverlessState.service.provider.region as string,
-      functionName: serverlessState.service.functions.fireAntWorker.name as string
+      functionName: serverlessState.service.functions.fireAntWorker.name as string,
+
+      // TODO: Make this a config parameter
+      maxConcurrentScenariosPerFunction: 10
     };
 
     const loadTest = requireLoadTest(testFilePath);

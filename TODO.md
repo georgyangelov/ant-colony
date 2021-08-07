@@ -1,19 +1,17 @@
-- Project generator
-- Some docs
-- Better split of parallel work for lambdas
-- Lambda executions should max at 800s
-- Better console status for lambda executions
 - Support for data / setup phase
+    - Data files -> json / csv
+    - Download data single time before starting
+    - Prepare data before each scenario
 - Better fetch action:
     - Configurable connection pooling
+- Project generator
+- Some docs
+- Lambda executions should max at 800s
+- Better console status for lambda executions
 - Error handling
 - Lambda error handling
 - Improve CLI interface
-- GitHub actions
-    - CI
-    - Publish
 - More phase types
-- Split lambda executions to ~1 min of execution
 - Ability to cancel execution on Ctrl+C
 - Add eslint and prettier?
 - CloudWatch reporter

@@ -18,25 +18,22 @@ export class ConstantConcurrencyPhase implements Phase {
   async run(context: PhaseContext): Promise<PhaseRunResult> {
     await context.reporter.onPhaseStart(this, context);
 
+    // TODO: Make this run in batches of up to a few minutes so that reporting
+    //       is more responsive.
+    const results = await context.executor.runQueuedFor(
+      this.name,
+      {},
+      this.config.durationSeconds * 1000,
+      this.config.concurrency
+    );
+
     await Promise.all(
-      times(this.config.concurrency, () => this.scenarioThread(context))
+      results.map((result) => context.reporter.onDataFromWorker(result))
     );
 
     // TODO: In finally?
     await context.reporter.onPhaseComplete(this, context);
 
     return { phase: this };
-  }
-
-  private async scenarioThread(context: PhaseContext) {
-    // TODO: Make this run in batches of up to 1 minute so that reporting
-    //       is more responsive.
-    const { reporterData } = await context.executor.runQueuedFor(
-      this.name,
-      {},
-      this.config.durationSeconds * 1000
-    );
-
-    await context.reporter.onDataFromWorker(reporterData);
   }
 }

@@ -1,4 +1,5 @@
 import { InvocationType, InvokeCommand, LambdaClient,  } from "@aws-sdk/client-lambda";
+import { flatten, times } from "lodash";
 import { ExecutionResult, Executor, ExecutorRunContext } from "../executor";
 import { LoadTest } from "../tests";
 import { AsyncExecutor } from "./async-executor";
@@ -6,6 +7,8 @@ import { AsyncExecutor } from "./async-executor";
 export interface AWSLambdaConfig {
   region: string;
   functionName: string;
+
+  maxConcurrentScenariosPerFunction: number;
 }
 
 export interface LambdaPayload {
@@ -14,8 +17,8 @@ export interface LambdaPayload {
 
   phaseName: string;
   task: { type: 'runSingle' } |
-        { type: 'runQueued', count: number } |
-        { type: 'runQueuedFor', timeMs: number } |
+        { type: 'runQueued', numberOfRequestsPerQueue: number, numberOfQueues: number } |
+        { type: 'runQueuedFor', timeMs: number, numberOfQueues: number } |
         { type: 'runParallel', count: number };
 }
 
@@ -25,6 +28,8 @@ export interface LambdaResult {
 
 // TODO: This should keep track of how many lambdas are active
 export class AWSLambdaExecutor implements Executor {
+  private currentlyActiveLambdaCount = 0;
+
   constructor(
     private testModulePath: string,
     private lambdaConfig: AWSLambdaConfig
@@ -38,7 +43,7 @@ export class AWSLambdaExecutor implements Executor {
 
     try {
       const executor = new AsyncExecutor(test);
-      let results: ExecutionResult[];
+      let results: ExecutionResult[] = [];
 
       const task = event.task;
       switch (task.type) {
@@ -47,15 +52,29 @@ export class AWSLambdaExecutor implements Executor {
           break;
 
         case 'runQueued':
-          results = [await executor.runQueued(event.phaseName, event.context, task.count)];
+          results = await executor.runQueued(
+            event.phaseName,
+            event.context,
+            task.numberOfRequestsPerQueue,
+            task.numberOfQueues
+          );
           break;
 
         case 'runQueuedFor':
-          results = [await executor.runQueuedFor(event.phaseName, event.context, task.timeMs)];
+          results = await executor.runQueuedFor(
+            event.phaseName,
+            event.context,
+            task.timeMs,
+            task.numberOfQueues
+          );
           break;
 
         case 'runParallel': {
-          results = await executor.runParallel(event.phaseName, event.context, task.count);
+          results = await executor.runParallel(
+            event.phaseName,
+            event.context,
+            task.count
+          );
           break;
         }
 
@@ -81,18 +100,23 @@ export class AWSLambdaExecutor implements Executor {
       Payload: new TextEncoder().encode(JSON.stringify(input))
     });
 
-    const result = await client.send(command);
+    this.currentlyActiveLambdaCount++;
+    try {
+      const result = await client.send(command);
 
-    const payload = result.Payload;
-    if (!payload) {
-      throw new Error('Lambda did not return any payload, something failed');
+      const payload = result.Payload;
+      if (!payload) {
+        throw new Error('Lambda did not return any payload, something failed');
+      }
+
+      const response = JSON.parse(new TextDecoder().decode(payload));
+
+      // TODO: Need to check if response is error or not, it does not raise error
+
+      return response;
+    } finally {
+      this.currentlyActiveLambdaCount--;
     }
-
-    const response = JSON.parse(new TextDecoder().decode(payload));
-
-    // TODO: Need to check if response is error or not, it does not raise error
-
-    return response;
   }
 
   async runSingle(
@@ -112,46 +136,103 @@ export class AWSLambdaExecutor implements Executor {
   async runQueued(
     phaseName: string,
     context: ExecutorRunContext,
-    count: number
-  ): Promise<ExecutionResult> {
-    const { executionResults } = await this.runLambda({
-      context,
-      testModulePath: this.testModulePath,
-      phaseName,
-      task: { type: 'runQueued', count }
-    });
+    numberOfRequestsPerQueue: number,
+    numberOfQueues: number
+  ): Promise<ExecutionResult[]> {
+    const workSplit = this.splitWork(
+      numberOfQueues,
+      this.lambdaConfig.maxConcurrentScenariosPerFunction
+    );
 
-    return executionResults[0]!;
+    const results = await Promise.all(workSplit.map(async (tasksForWorker) => {
+      const { executionResults } = await this.runLambda({
+        context,
+        testModulePath: this.testModulePath,
+        phaseName,
+        task: {
+          type: 'runQueued',
+          numberOfRequestsPerQueue,
+          numberOfQueues: tasksForWorker
+        }
+      });
+
+      return executionResults;
+    }));
+
+    return flatten(results);
   }
 
   async runQueuedFor(
     phaseName: string,
     context: ExecutorRunContext,
-    timeMs: number
-  ): Promise<ExecutionResult> {
-    const { executionResults } = await this.runLambda({
-      context,
-      testModulePath: this.testModulePath,
-      phaseName,
-      task: { type: 'runQueuedFor', timeMs }
-    });
+    timeMs: number,
+    numberOfQueues: number
+  ): Promise<ExecutionResult[]> {
+    const workSplit = this.splitWork(
+      numberOfQueues,
+      this.lambdaConfig.maxConcurrentScenariosPerFunction
+    );
 
-    return executionResults[0]!;
+    const results = await Promise.all(workSplit.map(async (tasksForWorker) => {
+      const { executionResults } = await this.runLambda({
+        context,
+        testModulePath: this.testModulePath,
+        phaseName,
+        task: {
+          type: 'runQueuedFor',
+          timeMs,
+          numberOfQueues: tasksForWorker
+        }
+      });
+
+      return executionResults;
+    }));
+
+    return flatten(results);
   }
 
-  // TODO: This should split between multiple lambdas
   async runParallel(
     phaseName: string,
     context: ExecutorRunContext,
     count: number
   ): Promise<ExecutionResult[]> {
-    const { executionResults } = await this.runLambda({
-      context,
-      testModulePath: this.testModulePath,
-      phaseName,
-      task: { type: 'runParallel', count }
-    });
+    const workSplit = this.splitWork(
+      count,
+      this.lambdaConfig.maxConcurrentScenariosPerFunction
+    );
 
-    return executionResults;
+    const results = await Promise.all(workSplit.map(async (tasksForWorker) => {
+      const { executionResults } = await this.runLambda({
+        context,
+        testModulePath: this.testModulePath,
+        phaseName,
+        task: {
+          type: 'runParallel',
+          count: tasksForWorker
+        }
+      });
+
+      return executionResults;
+    }));
+
+    return flatten(results);
+  }
+
+  private splitWork(tasks: number, maxTasksPerWorker: number) {
+    if (tasks === 0) {
+      return [];
+    }
+
+    const numberOfWorkers = Math.ceil(tasks / maxTasksPerWorker);
+    const numberOfTasksPerWorker = maxTasksPerWorker;
+    const numberOfTasksForLastWorker = tasks - (numberOfWorkers - 1) * numberOfTasksPerWorker;
+
+    return times(numberOfWorkers, (i) => {
+      if (i === numberOfWorkers - 1) {
+        return numberOfTasksForLastWorker;
+      }
+
+      return numberOfTasksPerWorker;
+    });
   }
 }

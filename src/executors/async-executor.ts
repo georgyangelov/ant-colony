@@ -27,30 +27,36 @@ export class AsyncExecutor implements Executor {
   async runQueued(
     phaseName: string,
     context: ExecutorRunContext,
-    count: number
-  ): Promise<ExecutionResult> {
+    numberOfRequestsPerQueue: number,
+    numberOfQueues: number
+  ): Promise<ExecutionResult[]> {
     const phase = this.findPhase(phaseName);
 
-    return this.withWorkerReporter(phase, async workerReporter => {
-      for (let i = 0; i < count; i++) {
-        await this.runOne(phase, workerReporter);
-      }
-    });
+    return Promise.all(times(numberOfQueues).map(() => {
+      return this.withWorkerReporter(phase, async workerReporter => {
+        for (let i = 0; i < numberOfRequestsPerQueue; i++) {
+          await this.runOne(phase, workerReporter);
+        }
+      });
+    }));
   }
 
   async runQueuedFor(
     phaseName: string,
     context: ExecutorRunContext,
-    timeMs: number
-  ): Promise<ExecutionResult> {
+    timeMs: number,
+    numberOfQueues: number
+  ): Promise<ExecutionResult[]> {
     const phase = this.findPhase(phaseName);
     const startTimeMs = Date.now();
 
-    return this.withWorkerReporter(phase, async workerReporter => {
-      while (Date.now() < startTimeMs + timeMs) {
-        await this.runOne(phase, workerReporter);
-      }
-    });
+    return Promise.all(times(numberOfQueues).map(() => {
+      return this.withWorkerReporter(phase, async workerReporter => {
+        while (Date.now() < startTimeMs + timeMs) {
+          await this.runOne(phase, workerReporter);
+        }
+      });
+    }));
   }
 
   async runParallel(
