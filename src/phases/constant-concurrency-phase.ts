@@ -26,7 +26,9 @@ export class ConstantConcurrencyPhase implements Phase {
       this.config.concurrency
     );
 
-    await Promise.all(results.map(result => context.reporter.onDataFromWorker(result)));
+    await Promise.all(
+      results.map(result => context.reporter.onDataFromWorker(result))
+    );
 
     // TODO: In finally?
     await context.reporter.onPhaseComplete(this, context);

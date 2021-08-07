@@ -6,7 +6,10 @@ import { URL } from 'url';
 
 // const OriginalClientRequest: any = http.ClientRequest;
 
-function wrapClientRequest(config: RequestOptions, request: http.ClientRequest) {
+function wrapClientRequest(
+  config: RequestOptions,
+  request: http.ClientRequest
+) {
   const startedAtUnixMs = Date.now();
 
   request.on('response', response => {
@@ -46,11 +49,24 @@ export const NodeHTTPInterceptor = {
 
   hook() {
     const originalHttpRequest: any = http.request;
-    (http as any).request = function request(this: any, url: any, options: any, callback: any) {
-      const clientRequest = originalHttpRequest.apply(this, [url, options, callback]);
+    (http as any).request = function request(
+      this: any,
+      url: any,
+      options: any,
+      callback: any
+    ) {
+      const clientRequest = originalHttpRequest.apply(this, [
+        url,
+        options,
+        callback
+      ]);
 
       if (NodeHTTPInterceptor.intercepting) {
-        const { options: requestConfig } = normalizeOptions(url, options, callback);
+        const { options: requestConfig } = normalizeOptions(
+          url,
+          options,
+          callback
+        );
 
         wrapClientRequest(requestConfig, clientRequest);
       }
@@ -59,11 +75,24 @@ export const NodeHTTPInterceptor = {
     };
 
     const originalHttpsRequest: any = https.request;
-    (https as any).request = function request(this: any, url: any, options: any, callback: any) {
-      const clientRequest = originalHttpsRequest.apply(this, [url, options, callback]);
+    (https as any).request = function request(
+      this: any,
+      url: any,
+      options: any,
+      callback: any
+    ) {
+      const clientRequest = originalHttpsRequest.apply(this, [
+        url,
+        options,
+        callback
+      ]);
 
       if (NodeHTTPInterceptor.intercepting) {
-        const { options: requestConfig } = normalizeOptions(url, options, callback);
+        const { options: requestConfig } = normalizeOptions(
+          url,
+          options,
+          callback
+        );
 
         wrapClientRequest(requestConfig, clientRequest);
       }

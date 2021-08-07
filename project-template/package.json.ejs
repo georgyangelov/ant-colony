@@ -1,0 +1,24 @@
+{
+  "name": "ant-colony-project",
+  "version": "1.0.0",
+  "private": true,
+  "description": "",
+  "scripts": {
+    "start": "ant-colony run tests/simple.ts",
+    "serverless": "serverless",
+    "start:serverless": "serverless deploy && ant-colony run-serverless tests/simple.ts",
+    "start:serverless:nodeploy": "ant-colony run-serverless tests/simple.ts"
+  },
+  "author": "",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "ant-colony": "^<%= antColonyVersion %>"
+  },
+  "devDependencies": {
+    "@types/node": "^16.4.10",
+    "serverless": "^2.52.1",
+    "serverless-plugin-typescript": "^1.1.9",
+    "ts-node": "^10.1.0",
+    "typescript": "^4.3.5"
+  }
+}

@@ -1,6 +1,9 @@
 import { expose } from 'threads';
 import { workerData } from 'worker_threads';
-import { WorkerData, newWorkerThread } from '../executors/worker-thread-executor';
+import {
+  WorkerData,
+  newWorkerThread
+} from '../executors/worker-thread-executor';
 import { LoadTest } from '../tests';
 
 const data: WorkerData = workerData;

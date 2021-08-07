@@ -1,4 +1,8 @@
-import { InvocationType, InvokeCommand, LambdaClient } from '@aws-sdk/client-lambda';
+import {
+  InvocationType,
+  InvokeCommand,
+  LambdaClient
+} from '@aws-sdk/client-lambda';
 import { flatten, times } from 'lodash';
 import { ExecutionResult, Executor, ExecutorRunContext } from '../executor';
 import { LoadTest } from '../tests';
@@ -35,9 +39,15 @@ export interface LambdaResult {
 export class AWSLambdaExecutor implements Executor {
   private currentlyActiveLambdaCount = 0;
 
-  constructor(private testModulePath: string, private lambdaConfig: AWSLambdaConfig) {}
+  constructor(
+    private testModulePath: string,
+    private lambdaConfig: AWSLambdaConfig
+  ) {}
 
-  static async lambdaHandler(event: LambdaPayload, context: any): Promise<LambdaResult> {
+  static async lambdaHandler(
+    event: LambdaPayload,
+    context: any
+  ): Promise<LambdaResult> {
     const modulePath = event.testModulePath.replace(/\.ts$/, '.js');
     const test = require(modulePath).default as LoadTest;
 
@@ -72,7 +82,11 @@ export class AWSLambdaExecutor implements Executor {
           break;
 
         case 'runParallel': {
-          results = await executor.runParallel(event.phaseName, event.context, task.count);
+          results = await executor.runParallel(
+            event.phaseName,
+            event.context,
+            task.count
+          );
           break;
         }
 
@@ -118,7 +132,10 @@ export class AWSLambdaExecutor implements Executor {
     }
   }
 
-  async runSingle(phaseName: string, context: ExecutorRunContext): Promise<ExecutionResult> {
+  async runSingle(
+    phaseName: string,
+    context: ExecutorRunContext
+  ): Promise<ExecutionResult> {
     const { executionResults } = await this.runLambda({
       context,
       testModulePath: this.testModulePath,
@@ -196,7 +213,10 @@ export class AWSLambdaExecutor implements Executor {
     context: ExecutorRunContext,
     count: number
   ): Promise<ExecutionResult[]> {
-    const workSplit = this.splitWork(count, this.lambdaConfig.maxConcurrentScenariosPerFunction);
+    const workSplit = this.splitWork(
+      count,
+      this.lambdaConfig.maxConcurrentScenariosPerFunction
+    );
 
     const results = await Promise.all(
       workSplit.map(async tasksForWorker => {
@@ -224,7 +244,8 @@ export class AWSLambdaExecutor implements Executor {
 
     const numberOfWorkers = Math.ceil(tasks / maxTasksPerWorker);
     const numberOfTasksPerWorker = maxTasksPerWorker;
-    const numberOfTasksForLastWorker = tasks - (numberOfWorkers - 1) * numberOfTasksPerWorker;
+    const numberOfTasksForLastWorker =
+      tasks - (numberOfWorkers - 1) * numberOfTasksPerWorker;
 
     return times(numberOfWorkers, i => {
       if (i === numberOfWorkers - 1) {

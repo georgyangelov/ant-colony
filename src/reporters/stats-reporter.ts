@@ -77,7 +77,11 @@ export class StatsWorkerReporter implements WorkerReporter<PhaseWorkerStats> {
   onScenarioComplete(scenario: Scenario, context: ScenarioContext) {}
   onScenarioError(scenario: Scenario, context: ScenarioContext) {}
 
-  onRequestComplete(request: RequestActionInfo, scenario: Scenario, context: ScenarioContext) {
+  onRequestComplete(
+    request: RequestActionInfo,
+    scenario: Scenario,
+    context: ScenarioContext
+  ) {
     this.stats.requestTimings.push([
       request.startedAtUnixMs,
       request.responseTimeMs,

@@ -1,10 +1,19 @@
+- Project generator
+  - Do I need a CLI or can it become part of the generated project?
+  - .env
+  - verification mechanism for scenarios
+  - Docs:
+    - How to install
+    - How to run tests
+    - How to add scenarios
+    - How to add tests
+    - How to configure
 - Support for data / setup phase
   - Data files -> json / csv
   - Download data single time before starting
   - Prepare data before each scenario
 - Better fetch action:
   - Configurable connection pooling
-- Project generator
 - Some docs
 - Lambda executions should max at 800s
 - Better console status for lambda executions
@@ -13,10 +22,10 @@
 - Improve CLI interface
 - More phase types
 - Ability to cancel execution on Ctrl+C
-- Add eslint and prettier?
 - CloudWatch reporter
-- Example with SDK?
 - Better tests
 - A way to do assertions
+- Move to `@ant-colony/core` in npm to support `@ant-colony/plugin`
 - Static way to call the actions, like in tests
-- Do I need a CLI or can it become part of the generated project?
+- Example with SDK?
+- Add eslint?

@@ -4,7 +4,11 @@ import { Phase, PhaseContext } from '../phases';
 import { Reporter, WorkerReporter } from '../reporter';
 import { Scenario, ScenarioContext } from '../scenarios';
 import { LoadTest } from '../tests';
-import { PhaseWorkerStats, StatsReporter, StatsWorkerReporter } from './stats-reporter';
+import {
+  PhaseWorkerStats,
+  StatsReporter,
+  StatsWorkerReporter
+} from './stats-reporter';
 import percentile from 'percentile';
 
 export class ConsoleReporter implements Reporter<PhaseWorkerStats> {
@@ -36,7 +40,10 @@ export class ConsoleReporter implements Reporter<PhaseWorkerStats> {
   onPhaseError(phase: Phase, context: PhaseContext) {}
 
   workerReporterFor(test: LoadTest, phase: Phase) {
-    const statsWorkerReporter = this.statsReporter.workerReporterFor(test, phase);
+    const statsWorkerReporter = this.statsReporter.workerReporterFor(
+      test,
+      phase
+    );
 
     return new ConsoleWorkerReporter(statsWorkerReporter);
   }
@@ -51,7 +58,8 @@ export class ConsoleReporter implements Reporter<PhaseWorkerStats> {
       return;
     }
 
-    const averageTimeMs = sumBy(stats.requestTimings, _ => _[1]) / stats.requestTimings.length;
+    const averageTimeMs =
+      sumBy(stats.requestTimings, _ => _[1]) / stats.requestTimings.length;
 
     const [p90, p95, p98, p99, max] = percentile(
       [90, 95, 98, 99, 100],
@@ -104,7 +112,11 @@ class ConsoleWorkerReporter implements WorkerReporter<PhaseWorkerStats> {
     this.statsWorker.onScenarioError(scenario, context);
   }
 
-  onRequestComplete(request: RequestActionInfo, scenario: Scenario, context: ScenarioContext) {
+  onRequestComplete(
+    request: RequestActionInfo,
+    scenario: Scenario,
+    context: ScenarioContext
+  ) {
     this.statsWorker.onRequestComplete(request, scenario, context);
 
     process.stdout.write('.');

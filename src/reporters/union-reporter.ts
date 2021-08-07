@@ -23,25 +23,35 @@ export class UnionReporter implements Reporter<any> {
     await Promise.all(this.reporters.map(reporter => reporter.onRunStart(run)));
   }
   async onRunComplete(run: LoadTest) {
-    await Promise.all(this.reporters.map(reporter => reporter.onRunComplete(run)));
+    await Promise.all(
+      this.reporters.map(reporter => reporter.onRunComplete(run))
+    );
   }
   async onRunError(run: LoadTest) {
     await Promise.all(this.reporters.map(reporter => reporter.onRunError(run)));
   }
 
   async onPhaseStart(phase: Phase, context: PhaseContext) {
-    await Promise.all(this.reporters.map(reporter => reporter.onPhaseStart(phase, context)));
+    await Promise.all(
+      this.reporters.map(reporter => reporter.onPhaseStart(phase, context))
+    );
   }
   async onPhaseComplete(phase: Phase, context: PhaseContext) {
-    await Promise.all(this.reporters.map(reporter => reporter.onPhaseComplete(phase, context)));
+    await Promise.all(
+      this.reporters.map(reporter => reporter.onPhaseComplete(phase, context))
+    );
   }
 
   workerReporterFor(test: LoadTest, phase: Phase) {
-    return new UnionWorkerReporter(this.reporters.map(_ => _.workerReporterFor(test, phase)));
+    return new UnionWorkerReporter(
+      this.reporters.map(_ => _.workerReporterFor(test, phase))
+    );
   }
 
   async onDataFromWorker(data: any) {
-    await Promise.all(this.reporters.map((reporter, i) => reporter.onDataFromWorker(data[i])));
+    await Promise.all(
+      this.reporters.map((reporter, i) => reporter.onDataFromWorker(data[i]))
+    );
   }
 }
 
@@ -53,20 +63,34 @@ class UnionWorkerReporter implements WorkerReporter<any> {
   }
 
   async complete() {
-    return Promise.all(this.reporters.map(reporter => reporter.complete())) as any;
+    return Promise.all(
+      this.reporters.map(reporter => reporter.complete())
+    ) as any;
   }
 
   onScenarioStart(scenario: Scenario, context: ScenarioContext) {
-    this.reporters.forEach(reporter => reporter.onScenarioStart(scenario, context));
+    this.reporters.forEach(reporter =>
+      reporter.onScenarioStart(scenario, context)
+    );
   }
   onScenarioComplete(scenario: Scenario, context: ScenarioContext) {
-    this.reporters.forEach(reporter => reporter.onScenarioComplete(scenario, context));
+    this.reporters.forEach(reporter =>
+      reporter.onScenarioComplete(scenario, context)
+    );
   }
   onScenarioError(scenario: Scenario, context: ScenarioContext) {
-    this.reporters.forEach(reporter => reporter.onScenarioError(scenario, context));
+    this.reporters.forEach(reporter =>
+      reporter.onScenarioError(scenario, context)
+    );
   }
 
-  onRequestComplete(request: RequestActionInfo, scenario: Scenario, context: ScenarioContext) {
-    this.reporters.forEach(reporter => reporter.onRequestComplete(request, scenario, context));
+  onRequestComplete(
+    request: RequestActionInfo,
+    scenario: Scenario,
+    context: ScenarioContext
+  ) {
+    this.reporters.forEach(reporter =>
+      reporter.onRequestComplete(request, scenario, context)
+    );
   }
 }

@@ -25,8 +25,14 @@ describe('Scenario', () => {
 
     await scenario.run(context);
 
-    expect(context.reporter.onScenarioStart).toHaveBeenCalledWith(scenario, context);
-    expect(context.reporter.onScenarioComplete).toHaveBeenCalledWith(scenario, context);
+    expect(context.reporter.onScenarioStart).toHaveBeenCalledWith(
+      scenario,
+      context
+    );
+    expect(context.reporter.onScenarioComplete).toHaveBeenCalledWith(
+      scenario,
+      context
+    );
   });
 
   it('calls onScenarioComplete even on error', async () => {
@@ -37,9 +43,18 @@ describe('Scenario', () => {
       reporter: mockObject()
     });
 
-    await expect(scenario.run(context)).rejects.toHaveProperty('message', 'expected error');
+    await expect(scenario.run(context)).rejects.toHaveProperty(
+      'message',
+      'expected error'
+    );
 
-    expect(context.reporter.onScenarioStart).toHaveBeenCalledWith(scenario, context);
-    expect(context.reporter.onScenarioComplete).toHaveBeenCalledWith(scenario, context);
+    expect(context.reporter.onScenarioStart).toHaveBeenCalledWith(
+      scenario,
+      context
+    );
+    expect(context.reporter.onScenarioComplete).toHaveBeenCalledWith(
+      scenario,
+      context
+    );
   });
 });

@@ -1,4 +1,10 @@
-import { AsyncExecutor, LoadTest, Scenario, SingleRunPhase, StatsReporter } from '../../src';
+import {
+  AsyncExecutor,
+  LoadTest,
+  Scenario,
+  SingleRunPhase,
+  StatsReporter
+} from '../../src';
 
 describe('Simple load test', () => {
   it('runs phases one by one', async () => {

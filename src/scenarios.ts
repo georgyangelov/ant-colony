@@ -50,7 +50,10 @@ export class Scenario implements IScenario {
     );
   }
 
-  constructor(public name: string, private runFn: (actions: Actions) => Promise<void>) {}
+  constructor(
+    public name: string,
+    private runFn: (actions: Actions) => Promise<void>
+  ) {}
 
   async run(context: ScenarioContext) {
     await Scenario.current.set({ scenario: this, context }, async () => {

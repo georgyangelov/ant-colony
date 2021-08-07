@@ -1,6 +1,9 @@
 import { uniq } from 'lodash';
 import { Executor } from './executor';
-import { InterceptedResponse, NodeHTTPInterceptor } from './lib/node-http-interceptor';
+import {
+  InterceptedResponse,
+  NodeHTTPInterceptor
+} from './lib/node-http-interceptor';
 import { timed } from './lib/timed';
 import { Phase, PhaseContext, PhaseRunResult } from './phases';
 import { Reporter } from './reporter';
@@ -20,7 +23,9 @@ export interface TestRunResult {
 }
 
 export class LoadTest {
-  public readonly phasesByName = new Map(this.config.phases.map(phase => [phase.name, phase]));
+  public readonly phasesByName = new Map(
+    this.config.phases.map(phase => [phase.name, phase])
+  );
 
   constructor(public config: TestRunConfig) {
     LoadTest.validateConfig(this.config);
@@ -40,7 +45,10 @@ export class LoadTest {
     }
 
     function onInterceptedRequest(intercepted: InterceptedResponse) {
-      if (interceptorConfig && interceptorConfig.host === intercepted.request.host) {
+      if (
+        interceptorConfig &&
+        interceptorConfig.host === intercepted.request.host
+      ) {
         Scenario.onInterceptedRequest(intercepted);
       }
     }

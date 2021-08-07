@@ -20,6 +20,9 @@ describe('SingleRunPhase', () => {
 
     expect(context.reporter.onPhaseStart).toHaveBeenCalledWith(phase, context);
     expect(context.executor.runSingle).toHaveBeenCalledWith(phase.name, {});
-    expect(context.reporter.onPhaseComplete).toHaveBeenCalledWith(phase, context);
+    expect(context.reporter.onPhaseComplete).toHaveBeenCalledWith(
+      phase,
+      context
+    );
   });
 });

@@ -9,16 +9,17 @@
     "build": "tsc",
     "test": "jest",
     "prettier:check": "prettier --check .",
-    "ants": "ts-node src/bin/ants.ts",
+    "ant-colony": "ts-node src/bin/ant-colony.ts",
     "test-server": "ts-node examples/simple-http-server.ts",
     "example:simple": "yarn run ants -- run ./src/simple.ts"
   },
   "bin": {
-    "ant-colony": "dist/bin/ants.js",
-    "ants": "dist/bin/ants.js"
+    "ant-colony": "dist/bin/ant-colony.js",
+    "ants": "dist/bin/ant-colony.js"
   },
   "files": [
     "dist/**/*",
+    "project-template/**/*",
     "README.md",
     "LICENSE",
     "package.json"
@@ -26,14 +27,18 @@
   "dependencies": {
     "@aws-sdk/client-lambda": "^3.24.0",
     "commander": "^8.1.0",
+    "ejs": "^3.1.6",
     "eventemitter3": "^4.0.7",
+    "glob": "^7.1.7",
     "lodash": "^4.17.21",
     "node-fetch": "^2.6.1",
     "percentile": "^1.5.0",
     "threads": "^1.6.5"
   },
   "devDependencies": {
+    "@types/ejs": "^3.0.7",
     "@types/eventemitter3": "^2.0.2",
+    "@types/glob": "^7.1.4",
     "@types/jest": "^26.0.24",
     "@types/lodash": "^4.14.171",
     "@types/node": "^16.4.8",

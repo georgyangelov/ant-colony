@@ -66,7 +66,10 @@ export class WorkerThreadExecutor implements Executor {
     await this.pool?.terminate();
   }
 
-  async runSingle(phaseName: string, context: ExecutorRunContext): Promise<ExecutionResult> {
+  async runSingle(
+    phaseName: string,
+    context: ExecutorRunContext
+  ): Promise<ExecutionResult> {
     return this.pool!.queue(thread => thread.runSingle(phaseName, context));
   }
 
@@ -95,7 +98,9 @@ export class WorkerThreadExecutor implements Executor {
   ): Promise<ExecutionResult[]> {
     const results = await Promise.all(
       times(numberOfQueues).map(() => {
-        return this.pool!.queue(thread => thread.runQueuedFor(phaseName, context, timeMs, 1));
+        return this.pool!.queue(thread =>
+          thread.runQueuedFor(phaseName, context, timeMs, 1)
+        );
       })
     );
 
@@ -114,7 +119,11 @@ export class WorkerThreadExecutor implements Executor {
     ];
 
     const results = await Promise.all(
-      jobs.map(count => this.pool!.queue(thread => thread.runParallel(phaseName, context, count)))
+      jobs.map(count =>
+        this.pool!.queue(thread =>
+          thread.runParallel(phaseName, context, count)
+        )
+      )
     );
 
     return flatten(results);

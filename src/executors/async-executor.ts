@@ -11,7 +11,10 @@ export class AsyncExecutor implements Executor {
   async start(): Promise<void> {}
   async stop(): Promise<void> {}
 
-  async runSingle(phaseName: string, context: ExecutorRunContext): Promise<ExecutionResult> {
+  async runSingle(
+    phaseName: string,
+    context: ExecutorRunContext
+  ): Promise<ExecutionResult> {
     const phase = this.findPhase(phaseName);
 
     return this.withWorkerReporter(phase, workerReporter => {
@@ -65,11 +68,16 @@ export class AsyncExecutor implements Executor {
   ): Promise<ExecutionResult[]> {
     const phase = this.findPhase(phaseName);
 
-    const workerData = await this.withWorkerReporter(phase, async workerReporter => {
-      const scenarioRuns = times(count, () => this.runOne(phase, workerReporter));
+    const workerData = await this.withWorkerReporter(
+      phase,
+      async workerReporter => {
+        const scenarioRuns = times(count, () =>
+          this.runOne(phase, workerReporter)
+        );
 
-      await Promise.all(scenarioRuns);
-    });
+        await Promise.all(scenarioRuns);
+      }
+    );
 
     return [workerData];
   }

@@ -31,5 +31,9 @@ export interface WorkerReporter<WorkerDataT extends BaseWorkerData> {
   onScenarioComplete(scenario: Scenario, context: ScenarioContext): void;
   onScenarioError(scenario: Scenario, context: ScenarioContext): void;
 
-  onRequestComplete(request: RequestActionInfo, scenario: Scenario, context: ScenarioContext): void;
+  onRequestComplete(
+    request: RequestActionInfo,
+    scenario: Scenario,
+    context: ScenarioContext
+  ): void;
 }

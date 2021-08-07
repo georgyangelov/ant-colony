@@ -20,7 +20,8 @@ export function mockObject<T>(overrides: Partial<T> = {}): T {
           return innerTarget[fnName];
         }
 
-        innerTarget[fnName] = fnName in innerTarget ? innerTarget[fnName] : jest.fn();
+        innerTarget[fnName] =
+          fnName in innerTarget ? innerTarget[fnName] : jest.fn();
 
         return innerTarget[fnName];
       }
