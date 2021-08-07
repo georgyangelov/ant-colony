@@ -1,10 +1,10 @@
-import { uniq } from "lodash";
-import { Executor } from "./executor";
-import { InterceptedResponse, NodeHTTPInterceptor } from "./lib/node-http-interceptor";
-import { timed } from "./lib/timed";
-import { Phase, PhaseContext, PhaseRunResult } from "./phases";
-import { Reporter } from "./reporter";
-import { Scenario } from "./scenarios";
+import { uniq } from 'lodash';
+import { Executor } from './executor';
+import { InterceptedResponse, NodeHTTPInterceptor } from './lib/node-http-interceptor';
+import { timed } from './lib/timed';
+import { Phase, PhaseContext, PhaseRunResult } from './phases';
+import { Reporter } from './reporter';
+import { Scenario } from './scenarios';
 
 export interface TestRunConfig {
   reporter: Reporter<any>;
@@ -20,9 +20,7 @@ export interface TestRunResult {
 }
 
 export class LoadTest {
-  public readonly phasesByName = new Map(
-    this.config.phases.map(phase => [phase.name, phase])
-  );
+  public readonly phasesByName = new Map(this.config.phases.map(phase => [phase.name, phase]));
 
   constructor(public config: TestRunConfig) {
     LoadTest.validateConfig(this.config);
@@ -83,7 +81,7 @@ export class LoadTest {
 
       return {
         totalTimeSeconds: totalTimeMs / 1000,
-        phaseResults,
+        phaseResults
       };
     } finally {
       stopIntercepting();

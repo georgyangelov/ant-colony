@@ -8,6 +8,7 @@
   "scripts": {
     "build": "tsc",
     "test": "jest",
+    "prettier:check": "prettier --check .",
     "ants": "ts-node src/bin/ants.ts",
     "test-server": "ts-node examples/simple-http-server.ts",
     "example:simple": "yarn run ants -- run ./src/simple.ts"
@@ -38,6 +39,7 @@
     "@types/node": "^16.4.8",
     "@types/node-fetch": "^2.5.12",
     "jest": "^27.0.6",
+    "prettier": "^2.3.2",
     "ts-jest": "^27.0.4",
     "ts-node": "^10.1.0",
     "typescript": "^4.3.5"

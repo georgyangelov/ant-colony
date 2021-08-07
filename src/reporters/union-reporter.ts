@@ -1,8 +1,8 @@
-import { RequestActionInfo } from "../actions";
-import { Phase, PhaseContext } from "../phases";
-import { Reporter, WorkerReporter } from "../reporter";
-import { Scenario, ScenarioContext } from "../scenarios";
-import { LoadTest } from "../tests";
+import { RequestActionInfo } from '../actions';
+import { Phase, PhaseContext } from '../phases';
+import { Reporter, WorkerReporter } from '../reporter';
+import { Scenario, ScenarioContext } from '../scenarios';
+import { LoadTest } from '../tests';
 
 // [
 //   Reporter<string>,
@@ -41,11 +41,7 @@ export class UnionReporter implements Reporter<any> {
   }
 
   async onDataFromWorker(data: any) {
-    await Promise.all(
-      this.reporters.map((reporter, i) =>
-        reporter.onDataFromWorker(data[i])
-      )
-    );
+    await Promise.all(this.reporters.map((reporter, i) => reporter.onDataFromWorker(data[i])));
   }
 }
 

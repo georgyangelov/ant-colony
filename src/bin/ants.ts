@@ -6,7 +6,7 @@ import path from 'path';
 import { AsyncExecutor } from '../executors/async-executor';
 import { AWSLambdaConfig, AWSLambdaExecutor } from '../executors/aws-lambda-executor';
 import { WorkerThreadExecutor } from '../executors/worker-thread-executor';
-import { LoadTest } from "../tests";
+import { LoadTest } from '../tests';
 
 const program = new Command();
 
@@ -14,7 +14,7 @@ program
   .command('run <test-file-path>')
   // .option('--workers')
   .description('Run a test script')
-  .action(async (testFilePath) => {
+  .action(async testFilePath => {
     const loadTest = requireLoadTest(testFilePath);
 
     await loadTest.execute(new AsyncExecutor(loadTest));
@@ -24,12 +24,10 @@ program
 program
   .command('run-serverless <test-file-path>')
   .description('Run the test script in AWS Lambda')
-  .action(async (testFilePath) => {
+  .action(async testFilePath => {
     // TODO: Checks and error handling
     const serverlessStateFile = path.resolve(process.cwd(), '.serverless/serverless-state.json');
-    const serverlessState = JSON.parse(
-      readFileSync(serverlessStateFile, { encoding: 'utf-8' })
-    );
+    const serverlessState = JSON.parse(readFileSync(serverlessStateFile, { encoding: 'utf-8' }));
 
     const lambdaConfig: AWSLambdaConfig = {
       region: serverlessState.service.provider.region as string,
@@ -54,7 +52,7 @@ function requireLoadTest(testFilePath: string) {
       } catch {
         throw new Error(
           'Tried to load a `.ts` test file, but not running in ts-node and ' +
-          'could not require ts-node/register. Please make sure `ts-node` is installed'
+            'could not require ts-node/register. Please make sure `ts-node` is installed'
         );
       }
     }

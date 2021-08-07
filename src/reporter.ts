@@ -1,7 +1,7 @@
-import { RequestActionInfo } from "./actions";
-import { Phase, PhaseContext } from "./phases";
-import { Scenario, ScenarioContext } from "./scenarios";
-import { LoadTest } from "./tests";
+import { RequestActionInfo } from './actions';
+import { Phase, PhaseContext } from './phases';
+import { Scenario, ScenarioContext } from './scenarios';
+import { LoadTest } from './tests';
 
 type JSONValue = string | boolean | null | number;
 type JSONArray = (JSONValue | JSONArray | JSONObject)[];

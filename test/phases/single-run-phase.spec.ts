@@ -1,5 +1,5 @@
-import { Executor, PhaseContext, Scenario, SingleRunPhase } from "../../src";
-import { mockObject } from "../support/mock-object";
+import { Executor, PhaseContext, Scenario, SingleRunPhase } from '../../src';
+import { mockObject } from '../support/mock-object';
 
 describe('SingleRunPhase', () => {
   it('runs a scenario once', async () => {

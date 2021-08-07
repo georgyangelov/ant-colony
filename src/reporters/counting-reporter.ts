@@ -1,11 +1,11 @@
-import { Phase, PhaseContext } from "../phases";
-import { Reporter, WorkerReporter } from "../reporter";
-import { LoadTest } from "../tests";
+import { Phase, PhaseContext } from '../phases';
+import { Reporter, WorkerReporter } from '../reporter';
+import { LoadTest } from '../tests';
 
 type Counters = {
-  phases: 0,
-  scenarios: 0,
-  requests: 0
+  phases: 0;
+  scenarios: 0;
+  requests: 0;
 };
 
 export class CountingReporter implements Reporter<Counters> {
@@ -58,4 +58,3 @@ class CountingWorkerReporter implements WorkerReporter<Counters> {
     this.counters.requests++;
   }
 }
-

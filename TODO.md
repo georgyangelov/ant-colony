@@ -1,9 +1,9 @@
 - Support for data / setup phase
-    - Data files -> json / csv
-    - Download data single time before starting
-    - Prepare data before each scenario
+  - Data files -> json / csv
+  - Download data single time before starting
+  - Prepare data before each scenario
 - Better fetch action:
-    - Configurable connection pooling
+  - Configurable connection pooling
 - Project generator
 - Some docs
 - Lambda executions should max at 800s

@@ -1,4 +1,4 @@
-import { AsyncLocalStorage } from "async_hooks";
+import { AsyncLocalStorage } from 'async_hooks';
 
 export class ContinuationLocal<T> {
   private store = new AsyncLocalStorage<T>();

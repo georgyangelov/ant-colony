@@ -41,7 +41,7 @@ export interface InterceptedResponse {
 export const NodeHTTPInterceptor = {
   intercepting: false,
   events: new EventEmitter<{
-    response: [InterceptedResponse]
+    response: [InterceptedResponse];
   }>(),
 
   hook() {
@@ -113,7 +113,7 @@ function urlToOptions(url: URL) {
     // hash: url.hash,
     // search: url.search,
     // pathname: url.pathname,
-    path: `${url.pathname}${url.search || ''}`,
+    path: `${url.pathname}${url.search || ''}`
     // href: url.href,
   };
 

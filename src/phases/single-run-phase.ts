@@ -1,5 +1,5 @@
-import { Phase, PhaseContext, PhaseRunResult } from "../phases";
-import { IScenario } from "../scenarios";
+import { Phase, PhaseContext, PhaseRunResult } from '../phases';
+import { IScenario } from '../scenarios';
 
 export interface SingleRunPhaseConfig {
   name: string;

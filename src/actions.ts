@@ -1,4 +1,4 @@
-import { Scenario, ScenarioContext } from "./scenarios";
+import { Scenario, ScenarioContext } from './scenarios';
 import fetch from 'node-fetch';
 
 export interface RequestActionInfo {

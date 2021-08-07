@@ -1,5 +1,5 @@
-import { Scenario, ScenarioContext } from "../src";
-import { mockObject } from "./support/mock-object";
+import { Scenario, ScenarioContext } from '../src';
+import { mockObject } from './support/mock-object';
 
 describe('Scenario', () => {
   it('sets Scenario.current', () => {
@@ -7,7 +7,7 @@ describe('Scenario', () => {
       expect(Scenario.current.get()).toEqual({ scenario, context });
     });
 
-    const scenario = new Scenario("test", code);
+    const scenario = new Scenario('test', code);
     const context = mockObject<ScenarioContext>({
       reporter: mockObject()
     });
@@ -18,7 +18,7 @@ describe('Scenario', () => {
   });
 
   it('calls onScenarioStart and onScenarioComplete on reporter', async () => {
-    const scenario = new Scenario("test", async () => {});
+    const scenario = new Scenario('test', async () => {});
     const context = mockObject<ScenarioContext>({
       reporter: mockObject()
     });
@@ -30,7 +30,7 @@ describe('Scenario', () => {
   });
 
   it('calls onScenarioComplete even on error', async () => {
-    const scenario = new Scenario("test", async () => {
+    const scenario = new Scenario('test', async () => {
       throw new Error('expected error');
     });
     const context = mockObject<ScenarioContext>({

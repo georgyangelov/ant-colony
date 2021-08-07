@@ -1,4 +1,4 @@
-import { BaseWorkerData } from "./reporter";
+import { BaseWorkerData } from './reporter';
 
 export interface ExecutorRunContext {}
 
@@ -12,10 +12,7 @@ export interface Executor {
 
   // ensureCapacityForParallelScenarios(count: number): Promise<void>;
 
-  runSingle(
-    phaseName: string,
-    context: ExecutorRunContext
-  ): Promise<ExecutionResult>;
+  runSingle(phaseName: string, context: ExecutorRunContext): Promise<ExecutionResult>;
 
   runQueued(
     phaseName: string,

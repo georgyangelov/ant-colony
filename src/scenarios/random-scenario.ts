@@ -1,5 +1,5 @@
-import { sortBy, sumBy } from "lodash";
-import { IScenario, ScenarioContext } from "../scenarios";
+import { sortBy, sumBy } from 'lodash';
+import { IScenario, ScenarioContext } from '../scenarios';
 
 export interface RandomScenarioOption {
   scenario: IScenario;
@@ -9,9 +9,7 @@ export interface RandomScenarioOption {
 export class RandomScenario {
   private maxWeight: number;
 
-  constructor(
-    private scenarios: RandomScenarioOption[]
-  ) {
+  constructor(private scenarios: RandomScenarioOption[]) {
     if (scenarios.length === 0) {
       throw new Error('RandomScenario must have at least one scenario');
     }

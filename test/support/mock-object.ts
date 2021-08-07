@@ -1,13 +1,15 @@
-const IGNORED_PROPERTIES = Object.freeze(new Set([
-  'asymmetricMatch',
-  '$$typeof',
-  'constructor',
-  'toJSON',
-  '@@__IMMUTABLE_ITERABLE__@@',
-  '@@__IMMUTABLE_RECORD__@@',
-  'hasAttribute',
-  'nodeType'
-]));
+const IGNORED_PROPERTIES = Object.freeze(
+  new Set([
+    'asymmetricMatch',
+    '$$typeof',
+    'constructor',
+    'toJSON',
+    '@@__IMMUTABLE_ITERABLE__@@',
+    '@@__IMMUTABLE_RECORD__@@',
+    'hasAttribute',
+    'nodeType'
+  ])
+);
 
 export function mockObject<T>(overrides: Partial<T> = {}): T {
   return new Proxy(
@@ -18,11 +20,10 @@ export function mockObject<T>(overrides: Partial<T> = {}): T {
           return innerTarget[fnName];
         }
 
-        innerTarget[fnName] =
-          fnName in innerTarget ? innerTarget[fnName] : jest.fn();
+        innerTarget[fnName] = fnName in innerTarget ? innerTarget[fnName] : jest.fn();
 
         return innerTarget[fnName];
-      },
-    },
+      }
+    }
   );
 }

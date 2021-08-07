@@ -1,6 +1,6 @@
-import { Phase } from "../phases";
-import { Reporter, WorkerReporter } from "../reporter";
-import { LoadTest } from "../tests";
+import { Phase } from '../phases';
+import { Reporter, WorkerReporter } from '../reporter';
+import { LoadTest } from '../tests';
 
 export class VoidReporter implements Reporter<null> {
   onRunStart() {}

@@ -1,4 +1,13 @@
-import { ConstantConcurrencyPhase, CountingReporter, Scenario, SingleRunPhase, StatsReporter, UnionReporter, LoadTest, AsyncExecutor } from "../src";
+import {
+  ConstantConcurrencyPhase,
+  CountingReporter,
+  Scenario,
+  SingleRunPhase,
+  StatsReporter,
+  UnionReporter,
+  LoadTest,
+  AsyncExecutor
+} from '../src';
 
 const jestConsole = console;
 
@@ -15,26 +24,21 @@ describe('Simple examples', () => {
     // const scenario = new Scenario('Just wondering', async (actions) => {
     //   await actions.fetch('http://example.com');
     // });
-
     // const countingReporter = new CountingReporter();
     // const statsReporter = new StatsReporter();
-
     // const loadTest = new LoadTest({
     //   reporter: new UnionReporter([
     //     countingReporter,
     //     statsReporter
     //   ]),
-
     //   httpInterceptor: {
     //     host: 'example.com'
     //   },
-
     //   phases: [
     //     new SingleRunPhase({
     //       name: 'single-run',
     //       scenario
     //     }),
-
     //     // new RampPhase({
     //     //   name: 'ramp-up',
     //     //   durationSeconds: 20,
@@ -46,7 +50,6 @@ describe('Simple examples', () => {
     //     //
     //     //   scenario
     //     // }),
-
     //     new ConstantConcurrencyPhase({
     //       name: 'full-load',
     //       durationSeconds: 10,
@@ -55,23 +58,15 @@ describe('Simple examples', () => {
     //     })
     //   ]
     // });
-
     // const executor = new AsyncExecutor(loadTest);
-
     // const results = await loadTest.execute(executor);
-
     // console.log(results);
-
     // expect(countingReporter.counters.phases).toEqual(2);
-
     // console.log(statsReporter.stats);
-
     // // expect(countingReporter.counters.scenarios).toBeGreaterThan(149);
     // // expect(countingReporter.counters.scenarios).toBeLessThan(154);
-
     // // expect(countingReporter.counters.requests).toBeGreaterThan(149);
     // // expect(countingReporter.counters.requests).toBeLessThan(154);
-
     // expect(statsReporter.stats).toEqual([
     //   expect.objectContaining({ phase: expect.objectContaining({ name: 'single-run' }) }),
     //   expect.objectContaining({ phase: expect.objectContaining({ name: 'full-load' }) })

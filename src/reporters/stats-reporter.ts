@@ -1,8 +1,8 @@
-import { RequestActionInfo } from "../actions";
-import { Phase, PhaseContext } from "../phases";
-import { Reporter, WorkerReporter } from "../reporter";
-import { Scenario, ScenarioContext } from "../scenarios";
-import { LoadTest } from "../tests";
+import { RequestActionInfo } from '../actions';
+import { Phase, PhaseContext } from '../phases';
+import { Reporter, WorkerReporter } from '../reporter';
+import { Scenario, ScenarioContext } from '../scenarios';
+import { LoadTest } from '../tests';
 
 export interface PhaseStats extends PhaseWorkerStats {
   phase: Phase;
@@ -17,9 +17,9 @@ export type PhaseWorkerStats = {
 };
 
 export type RequestTiming = [
-  /* startedAt */    number,
+  /* startedAt */ number,
   /* responseTime */ number,
-  /* statusCode */   number | null
+  /* statusCode */ number | null
 ];
 
 export class StatsReporter implements Reporter<PhaseWorkerStats> {

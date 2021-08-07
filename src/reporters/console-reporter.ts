@@ -1,10 +1,10 @@
-import { groupBy, mapValues, sumBy } from "lodash";
-import { RequestActionInfo } from "../actions";
-import { Phase, PhaseContext } from "../phases";
-import { Reporter, WorkerReporter } from "../reporter";
-import { Scenario, ScenarioContext } from "../scenarios";
-import { LoadTest } from "../tests";
-import { PhaseWorkerStats, StatsReporter, StatsWorkerReporter } from "./stats-reporter";
+import { groupBy, mapValues, sumBy } from 'lodash';
+import { RequestActionInfo } from '../actions';
+import { Phase, PhaseContext } from '../phases';
+import { Reporter, WorkerReporter } from '../reporter';
+import { Scenario, ScenarioContext } from '../scenarios';
+import { LoadTest } from '../tests';
+import { PhaseWorkerStats, StatsReporter, StatsWorkerReporter } from './stats-reporter';
 import percentile from 'percentile';
 
 export class ConsoleReporter implements Reporter<PhaseWorkerStats> {
@@ -51,8 +51,7 @@ export class ConsoleReporter implements Reporter<PhaseWorkerStats> {
       return;
     }
 
-    const averageTimeMs =
-      sumBy(stats.requestTimings, _ => _[1]) / stats.requestTimings.length;
+    const averageTimeMs = sumBy(stats.requestTimings, _ => _[1]) / stats.requestTimings.length;
 
     const [p90, p95, p98, p99, max] = percentile(
       [90, 95, 98, 99, 100],
@@ -72,7 +71,11 @@ export class ConsoleReporter implements Reporter<PhaseWorkerStats> {
 
       responseTimesMs: {
         average: Math.round(averageTimeMs),
-        p90, p95, p98, p99, max
+        p90,
+        p95,
+        p98,
+        p99,
+        max
       }
     };
 

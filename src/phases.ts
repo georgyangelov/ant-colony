@@ -1,6 +1,6 @@
-import { Executor } from "./executor";
-import { Reporter } from "./reporter";
-import { IScenario } from "./scenarios";
+import { Executor } from './executor';
+import { Reporter } from './reporter';
+import { IScenario } from './scenarios';
 
 export interface Phase {
   name: string;
@@ -14,8 +14,5 @@ export interface PhaseRunResult {
 }
 
 export class PhaseContext {
-  constructor(
-    public executor: Executor,
-    public reporter: Reporter<any>
-  ) {}
+  constructor(public executor: Executor, public reporter: Reporter<any>) {}
 }

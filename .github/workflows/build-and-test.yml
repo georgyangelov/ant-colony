@@ -2,7 +2,7 @@ name: Build and Test
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
     branches:
       - '*'
@@ -27,4 +27,5 @@ jobs:
 
       - run: yarn --immutable
       - run: yarn build --noEmit
+      - run: yarn prettier:check
       - run: yarn test

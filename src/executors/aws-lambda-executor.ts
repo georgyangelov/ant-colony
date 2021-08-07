@@ -1,8 +1,8 @@
-import { InvocationType, InvokeCommand, LambdaClient,  } from "@aws-sdk/client-lambda";
-import { flatten, times } from "lodash";
-import { ExecutionResult, Executor, ExecutorRunContext } from "../executor";
-import { LoadTest } from "../tests";
-import { AsyncExecutor } from "./async-executor";
+import { InvocationType, InvokeCommand, LambdaClient } from '@aws-sdk/client-lambda';
+import { flatten, times } from 'lodash';
+import { ExecutionResult, Executor, ExecutorRunContext } from '../executor';
+import { LoadTest } from '../tests';
+import { AsyncExecutor } from './async-executor';
 
 export interface AWSLambdaConfig {
   region: string;
@@ -16,10 +16,15 @@ export interface LambdaPayload {
   context: ExecutorRunContext;
 
   phaseName: string;
-  task: { type: 'runSingle' } |
-        { type: 'runQueued', numberOfRequestsPerQueue: number, numberOfQueues: number } |
-        { type: 'runQueuedFor', timeMs: number, numberOfQueues: number } |
-        { type: 'runParallel', count: number };
+  task:
+    | { type: 'runSingle' }
+    | {
+        type: 'runQueued';
+        numberOfRequestsPerQueue: number;
+        numberOfQueues: number;
+      }
+    | { type: 'runQueuedFor'; timeMs: number; numberOfQueues: number }
+    | { type: 'runParallel'; count: number };
 }
 
 export interface LambdaResult {
@@ -30,10 +35,7 @@ export interface LambdaResult {
 export class AWSLambdaExecutor implements Executor {
   private currentlyActiveLambdaCount = 0;
 
-  constructor(
-    private testModulePath: string,
-    private lambdaConfig: AWSLambdaConfig
-  ) {}
+  constructor(private testModulePath: string, private lambdaConfig: AWSLambdaConfig) {}
 
   static async lambdaHandler(event: LambdaPayload, context: any): Promise<LambdaResult> {
     const modulePath = event.testModulePath.replace(/\.ts$/, '.js');
@@ -70,15 +72,12 @@ export class AWSLambdaExecutor implements Executor {
           break;
 
         case 'runParallel': {
-          results = await executor.runParallel(
-            event.phaseName,
-            event.context,
-            task.count
-          );
+          results = await executor.runParallel(event.phaseName, event.context, task.count);
           break;
         }
 
-        default: throw new Error('Unknown event task type');
+        default:
+          throw new Error('Unknown event task type');
       }
 
       return { executionResults: results };
@@ -119,10 +118,7 @@ export class AWSLambdaExecutor implements Executor {
     }
   }
 
-  async runSingle(
-    phaseName: string,
-    context: ExecutorRunContext
-  ): Promise<ExecutionResult> {
+  async runSingle(phaseName: string, context: ExecutorRunContext): Promise<ExecutionResult> {
     const { executionResults } = await this.runLambda({
       context,
       testModulePath: this.testModulePath,
@@ -144,20 +140,22 @@ export class AWSLambdaExecutor implements Executor {
       this.lambdaConfig.maxConcurrentScenariosPerFunction
     );
 
-    const results = await Promise.all(workSplit.map(async (tasksForWorker) => {
-      const { executionResults } = await this.runLambda({
-        context,
-        testModulePath: this.testModulePath,
-        phaseName,
-        task: {
-          type: 'runQueued',
-          numberOfRequestsPerQueue,
-          numberOfQueues: tasksForWorker
-        }
-      });
+    const results = await Promise.all(
+      workSplit.map(async tasksForWorker => {
+        const { executionResults } = await this.runLambda({
+          context,
+          testModulePath: this.testModulePath,
+          phaseName,
+          task: {
+            type: 'runQueued',
+            numberOfRequestsPerQueue,
+            numberOfQueues: tasksForWorker
+          }
+        });
 
-      return executionResults;
-    }));
+        return executionResults;
+      })
+    );
 
     return flatten(results);
   }
@@ -173,20 +171,22 @@ export class AWSLambdaExecutor implements Executor {
       this.lambdaConfig.maxConcurrentScenariosPerFunction
     );
 
-    const results = await Promise.all(workSplit.map(async (tasksForWorker) => {
-      const { executionResults } = await this.runLambda({
-        context,
-        testModulePath: this.testModulePath,
-        phaseName,
-        task: {
-          type: 'runQueuedFor',
-          timeMs,
-          numberOfQueues: tasksForWorker
-        }
-      });
+    const results = await Promise.all(
+      workSplit.map(async tasksForWorker => {
+        const { executionResults } = await this.runLambda({
+          context,
+          testModulePath: this.testModulePath,
+          phaseName,
+          task: {
+            type: 'runQueuedFor',
+            timeMs,
+            numberOfQueues: tasksForWorker
+          }
+        });
 
-      return executionResults;
-    }));
+        return executionResults;
+      })
+    );
 
     return flatten(results);
   }
@@ -196,24 +196,23 @@ export class AWSLambdaExecutor implements Executor {
     context: ExecutorRunContext,
     count: number
   ): Promise<ExecutionResult[]> {
-    const workSplit = this.splitWork(
-      count,
-      this.lambdaConfig.maxConcurrentScenariosPerFunction
+    const workSplit = this.splitWork(count, this.lambdaConfig.maxConcurrentScenariosPerFunction);
+
+    const results = await Promise.all(
+      workSplit.map(async tasksForWorker => {
+        const { executionResults } = await this.runLambda({
+          context,
+          testModulePath: this.testModulePath,
+          phaseName,
+          task: {
+            type: 'runParallel',
+            count: tasksForWorker
+          }
+        });
+
+        return executionResults;
+      })
     );
-
-    const results = await Promise.all(workSplit.map(async (tasksForWorker) => {
-      const { executionResults } = await this.runLambda({
-        context,
-        testModulePath: this.testModulePath,
-        phaseName,
-        task: {
-          type: 'runParallel',
-          count: tasksForWorker
-        }
-      });
-
-      return executionResults;
-    }));
 
     return flatten(results);
   }
@@ -227,7 +226,7 @@ export class AWSLambdaExecutor implements Executor {
     const numberOfTasksPerWorker = maxTasksPerWorker;
     const numberOfTasksForLastWorker = tasks - (numberOfWorkers - 1) * numberOfTasksPerWorker;
 
-    return times(numberOfWorkers, (i) => {
+    return times(numberOfWorkers, i => {
       if (i === numberOfWorkers - 1) {
         return numberOfTasksForLastWorker;
       }
